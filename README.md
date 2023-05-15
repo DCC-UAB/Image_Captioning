@@ -22,8 +22,12 @@ python main.py
 
 
 ## Contributors
-Write here the name and UAB mail of the group members
+- Alejandro Donaire: aledonairesa@gmail.com | https://www.linkedin.com/in/alejandro-donaire
+
+- Èric Sánchez: ericsanlopez@gmail.com | www.linkedin.com/in/ericsanlopez
+
+- Pau Ventura: pau.ventura.rodriguez@gmail.com | https://www.linkedin.com/in/pauvr
 
 Xarxes Neuronals i Aprenentatge Profund
-Grau de __Write here the name of your estudies (Artificial Intelligence, Data Engineering or Computational Mathematics & Data analyitics)__, 
+Grau de __Computational Mathematics & Data analyitics__, 
 UAB, 2023
