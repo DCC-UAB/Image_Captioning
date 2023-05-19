@@ -71,13 +71,14 @@ print_every = 100
 
 for epoch in range(1,num_epochs+1):   
     for idx, (image, captions) in enumerate(iter(data_loader)):
+        # Loading new batch
         image,captions = image.to(device),captions.to(device)
 
         # Zero the gradients.
         optimizer.zero_grad()
 
         # Feed forward
-        outputs,attentions = model(image, captions)
+        outputs, attentions = model(image, captions)
 
         # Calculate the batch loss.
         targets = captions[:,1:]
@@ -89,12 +90,12 @@ for epoch in range(1,num_epochs+1):
         # Update the parameters in the optimizer.
         optimizer.step()
 
+        # Print state of the training
         if (idx+1)%print_every == 0:
             print("Epoch: {} loss: {:.5f}".format(epoch,loss.item()))
             
-            
             #generate the caption
-            model.eval()
+            model.eval() # Canviem a eval per a generar la caption
             with torch.no_grad():
                 dataiter = iter(data_loader)
                 img,_ = next(dataiter)
@@ -103,7 +104,7 @@ for epoch in range(1,num_epochs+1):
                 caption = ' '.join(caps)
                 show_image(img[0],title=caption)
                 
-            model.train()
+            model.train() # Tornem a model Train per a seguir entrenant
         
     #save the latest model
     save_model(model,epoch)
