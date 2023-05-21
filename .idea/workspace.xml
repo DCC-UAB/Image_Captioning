@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="992c394b-0ea0-470d-891f-7b60c3ee65d9" name="Changes" comment="Notebooks changed">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="992c394b-0ea0-470d-891f-7b60c3ee65d9" name="Changes" comment="Notebook-understanding completion">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/image-captioning-with-attention-pytorch.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/image-captioning-with-attention-pytorch.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/xnap-project-matcad_grup_10.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/xnap-project-matcad_grup_10.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/notebook-understanding.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebook-understanding.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -36,7 +35,7 @@
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;web.server&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -69,6 +68,29 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python">
+      <module name="xnap-project-matcad_grup_10" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/home/xnmaster/.virtualenvs/xnap-project-matcad_grup_10/bin/python" />
+      <option name="SDK_NAME" value="Remote Python 3.8.16 (sftp://xnmaster@ml-lab-f16b9785-93b3-4cf9-952d-b7314da22250.westeurope.cloudapp.azure.com:53682/home/xnmaster/.virtualenvs/xnap-project-matcad_grup_10/bin/python)" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -81,7 +103,9 @@
       <workItem from="1684348440001" duration="3245000" />
       <workItem from="1684401541251" duration="1224000" />
       <workItem from="1684477821479" duration="3654000" />
-      <workItem from="1684481699534" duration="1425000" />
+      <workItem from="1684481699534" duration="2258000" />
+      <workItem from="1684578627702" duration="203000" />
+      <workItem from="1684680026798" duration="1499000" />
     </task>
     <task id="LOCAL-00001" summary="Notebooks changed">
       <created>1684315314726</created>
@@ -97,7 +121,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684481854839</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Notebook-understanding completion">
+      <created>1684487339752</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1684487339752</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -116,6 +147,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Notebooks changed" />
-    <option name="LAST_COMMIT_MESSAGE" value="Notebooks changed" />
+    <MESSAGE value="Notebook-understanding completion" />
+    <option name="LAST_COMMIT_MESSAGE" value="Notebook-understanding completion" />
   </component>
 </project>
