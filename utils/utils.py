@@ -67,7 +67,12 @@ class Vocabulary:
         frequencies = Counter()
         idx = 4
         
+        i = 1
+        length = len(sentence_list)
         for sentence in sentence_list:
+            i += 1
+            if not(i%100):
+                print(i, "Iterations done out of", length)
             for word in self.tokenize(sentence):
                 frequencies[word] += 1
                 
