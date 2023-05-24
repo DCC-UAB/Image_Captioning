@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torchvision
-import torchvision.transforms as transforms
+import torchvision.transforms as T
 
 from train import *
 from test import *
@@ -35,6 +35,9 @@ def model_pipeline(cfg: dict):
     with wandb.init(project="pytorch-demo", config=cfg):
         # access all HPs through wandb.config, so logging matches execution!
         config = wandb.config
+
+        # execute only once to create the dataset
+        # generate_and_dump_dataset(config.root_dir, config.captions_file, config.transforms)
 
         # make the model, data, and optimization problem
         model, train_loader, test_loader, criterion, optimizer = make(config)

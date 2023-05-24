@@ -12,30 +12,49 @@ import os
 from PIL import Image
 from models.models import *
 import joblib
+from copy import deepcopy
+from sklearn.model_selection import train_test_split
+
+
+def flickr_train_test_split(dataset, train_size):
+    # Splits dataset with same vocabulary
+    train_X, test_X = train_test_split(dataset.df, train_size=train_size)
+
+    train_dataset = deepcopy(dataset)
+    test_dataset = deepcopy(dataset)
+
+    train_dataset.df = train_X
+    train_dataset.images = train_X['image']
+    train_dataset.captions = train_X['caption']
+
+    test_dataset.df = test_X
+    test_dataset.images = test_X['image']
+    test_dataset.captions = test_X['caption']
+
+    return train_dataset, test_dataset
 
 
 # Make initializations
 def make(config, device="cuda"):
     # Make the data
-    train = get_data(train=True, root_dir=config.root_dir, captions_file=config.captions_file,
-                     transforms=config.transforms)
-    test = get_data(train=False, root_dir=config.root_dir, captions_file=config.captions_file,
-                    transforms=config.transforms)
+    dataset = joblib.load("./processed_dataset.joblib")
+
+    train_dataset, test_dataset = flickr_train_test_split(dataset, 0.8)
 
     global global_vocab
-    global_vocab = train.vocab
+    global_vocab = dataset.vocab
 
     config.vocab_size = len(global_vocab)
 
-    train_loader = get_data_loader(train, batch_size=config.batch_size)
-    test_loader = get_data_loader(test, batch_size=config.batch_size)
+    train_loader = get_data_loader(train_dataset, batch_size=config.batch_size)
+    test_loader = get_data_loader(test_dataset, batch_size=config.batch_size)
 
     # Make the model
     model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
                            config.decoder_dim).to(device)
 
     # Make the loss and optimizer
-    criterion = nn.CrossEntropyLoss(ignore_index=train.vocab.stoi["<PAD>"])
+    criterion = nn.CrossEntropyLoss(ignore_index=global_vocab.stoi["<PAD>"])
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
 
     return model, train_loader, test_loader, criterion, optimizer
