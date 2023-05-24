@@ -13,12 +13,13 @@ from PIL import Image
 from models.models import *
 
 
-# S'ha de canviar i adaptar al nostre projecte
+# Make initializations
 def make(config, device="cuda"):
     # Make the data
     train = get_data(train=True, root_dir=config.root_dir, captions_file=config.captions_file,
                      transforms=config.transforms)
-    test = get_data(train=False, root_dir=config.root_dir, captions_file=config.captions_file)
+    test = get_data(train=False, root_dir=config.root_dir, captions_file=config.captions_file,
+                    transforms=config.transforms)
     train_loader = get_data_loader(train, batch_size=config.batch_size)
     test_loader = get_data_loader(test, batch_size=config.batch_size)
 
@@ -106,23 +107,20 @@ class FlickrDataset(Dataset):
         return len(self.df)
 
     def __getitem__(self, idx):
+        caption = self.captions[idx]
         img_name = self.imgs[idx]
         img_location = os.path.join(self.root_dir, img_name)
         img = Image.open(img_location).convert("RGB")
+
+        # apply the transformation to the image
+        if self.transform is not None:
+            img = self.transform(img)
+
+        # numericalize the caption text
         caption_vec = []
-
-        # Captions and transformations only for train
-        if self.train:
-            caption = self.captions[idx]
-
-            # apply the transformation to the image
-            if self.transform is not None:
-                img = self.transform(img)
-
-            # numericalize the caption text
-            caption_vec += [self.vocab.stoi["<SOS>"]]
-            caption_vec += self.vocab.numericalize(caption)
-            caption_vec += [self.vocab.stoi["<EOS>"]]
+        caption_vec += [self.vocab.stoi["<SOS>"]]
+        caption_vec += self.vocab.numericalize(caption)
+        caption_vec += [self.vocab.stoi["<EOS>"]]
 
         return img, torch.tensor(caption_vec)
 
@@ -166,7 +164,7 @@ def get_data_loader(dataset, batch_size, shuffle=False, num_workers=1):
     batch_size: int
         number of data to load in a particular batch
     shuffle: boolean,optional;
-        should shuffle the datasests (default is False)
+        should shuffle the dataset (default is False)
     num_workers: int,optional
         numbers of workers to run (default is 1)  
     """
@@ -183,3 +181,40 @@ def get_data_loader(dataset, batch_size, shuffle=False, num_workers=1):
     )
 
     return data_loader
+
+
+# helper function to save the model
+def save_model(model, num_epochs):
+    model_state = {
+        'num_epochs': num_epochs,
+        'embed_size': embed_size,
+        'vocab_size': len(dataset.vocab),
+        'attention_dim': attention_dim,
+        'encoder_dim': encoder_dim,
+        'decoder_dim': decoder_dim,
+        'state_dict': model.state_dict()
+    }
+
+    torch.save(model_state, 'attention_model_state.pth')
+
+
+# generate caption
+def get_caps_from(model, features_tensors):
+    # generate the caption
+    model.eval()
+    with torch.no_grad():
+        features = model.encoder(features_tensors.to(device))
+        caps, alphas = model.decoder.generate_caption(features, vocab=dataset.vocab)
+
+    return caps, alphas
+
+
+def generate_and_dump_dataset(root_dir, captions_file, transforms):
+    # initialize the dataset class
+    dataset = FlickrDataset(
+        root_dir=root_dir,
+        captions_file=captions_file,
+        transform=transforms
+    )
+
+    joblib.dump(dataset, "./processed_dataset.joblib")

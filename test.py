@@ -1,22 +1,23 @@
 import wandb
 import torch
+from utils.utils import *
+from nltk.translate.bleu_score import sentence_bleu
 
 
 def test(model, test_loader, device="cuda", save: bool = True):
     # Run the model on some test examples
     with torch.no_grad():
-        correct, total = 0, 0
-        for images, labels in test_loader:
-            images, labels = images.to(device), labels.to(device)
-            outputs = model(images)
-            _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
+        acc_score, total = 0, 0
+        for images, captions in test_loader:
+            images, captions = images.to(device), captions.to(device)
+            predicted, _ = get_caps_from(model, images.unsqueeze(0))
+            acc_score += sentence_bleu(captions, predicted)
+            total += 1
 
-        print(f"Accuracy of the model on the {total} " +
-              f"test images: {correct / total:%}")
+        print(f"Mean BLEU score of the model on the {total} " +
+              f"test images: {acc_score / total * 100}%")
         
-        wandb.log({"test_accuracy": correct / total})
+        wandb.log({"test_mean_bleu": acc_score / total * 100})
 
     if save:
         print(len(images))

@@ -153,7 +153,7 @@ class EncoderDecoder(nn.Module):
         self.encoder = EncoderCNN()
         self.decoder = DecoderRNN(
             embed_size=embed_size,
-            vocab_size=len(dataset.vocab),
+            vocab_size=vocab_size,
             attention_dim=attention_dim,
             encoder_dim=encoder_dim,
             decoder_dim=decoder_dim
