@@ -3,7 +3,7 @@ import pandas as pd
 from collections import Counter
 import spacy
 import torch
-import torch.nn
+import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 from torch.nn.utils.rnn import pad_sequence
@@ -11,6 +11,7 @@ from torch.utils.data import Dataset, DataLoader
 import os
 from PIL import Image
 from models.models import *
+import joblib
 
 
 # Make initializations
@@ -20,6 +21,12 @@ def make(config, device="cuda"):
                      transforms=config.transforms)
     test = get_data(train=False, root_dir=config.root_dir, captions_file=config.captions_file,
                     transforms=config.transforms)
+
+    global global_vocab
+    global_vocab = train.vocab
+
+    config.vocab_size = len(global_vocab)
+
     train_loader = get_data_loader(train, batch_size=config.batch_size)
     test_loader = get_data_loader(test, batch_size=config.batch_size)
 
@@ -28,7 +35,7 @@ def make(config, device="cuda"):
                            config.decoder_dim).to(device)
 
     # Make the loss and optimizer
-    criterion = nn.CrossEntropyLoss(ignore_index=dataset.vocab.stoi["<PAD>"])
+    criterion = nn.CrossEntropyLoss(ignore_index=train.vocab.stoi["<PAD>"])
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
 
     return model, train_loader, test_loader, criterion, optimizer
@@ -184,14 +191,14 @@ def get_data_loader(dataset, batch_size, shuffle=False, num_workers=1):
 
 
 # helper function to save the model
-def save_model(model, num_epochs):
+def save_model(model, num_epochs, config):
     model_state = {
         'num_epochs': num_epochs,
-        'embed_size': embed_size,
-        'vocab_size': len(dataset.vocab),
-        'attention_dim': attention_dim,
-        'encoder_dim': encoder_dim,
-        'decoder_dim': decoder_dim,
+        'embed_size': config.embed_size,
+        'vocab_size': config.vocab_size,
+        'attention_dim': config.attention_dim,
+        'encoder_dim': config.encoder_dim,
+        'decoder_dim': config.decoder_dim,
         'state_dict': model.state_dict()
     }
 
@@ -199,12 +206,12 @@ def save_model(model, num_epochs):
 
 
 # generate caption
-def get_caps_from(model, features_tensors):
+def get_caps_from(model, features_tensors, device='cuda'):
     # generate the caption
     model.eval()
     with torch.no_grad():
         features = model.encoder(features_tensors.to(device))
-        caps, alphas = model.decoder.generate_caption(features, vocab=dataset.vocab)
+        caps, alphas = model.decoder.generate_caption(features, vocab=global_vocab)
 
     return caps, alphas
 

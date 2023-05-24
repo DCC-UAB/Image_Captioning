@@ -1,21 +1,22 @@
 from tqdm.auto import tqdm
 import wandb
+from utils.utils import *
 
 
-def train(model, data_loader, criterion, optimizer, vocab_size, num_epochs=25):
+def train(model, data_loader, criterion, optimizer, config, num_epochs=25):
     # Tell wandb to watch what the model gets up to: gradients, weights, and more!
     wandb.watch(model, criterion, log="all", log_freq=10)
 
     # Run training and track with wandb
-    total_batches = len(loader) * config.epochs
+    total_batches = len(data_loader) * config.epochs
     example_ct = 0  # number of examples seen
     batch_ct = 0
 
     for epoch in tqdm(range(1, num_epochs + 1)):
         for idx, (image, captions) in enumerate(iter(data_loader)):
 
-            loss = train_batch(image, captions, model, vocab_size, optimizer, criterion)
-            example_ct += len(images)
+            loss = train_batch(image, captions, model, config.vocab_size, optimizer, criterion)
+            example_ct += len(image)
             batch_ct += 1
 
             # Report metrics every 25th batch

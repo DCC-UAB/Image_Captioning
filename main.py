@@ -13,6 +13,9 @@ from test import *
 from utils.utils import *
 from tqdm.auto import tqdm
 
+# Global variables
+global global_vocab
+
 # Ensure deterministic behavior
 torch.backends.cudnn.deterministic = True
 random.seed(hash("setting random seeds") % 2**32 - 1)
@@ -40,7 +43,7 @@ def model_pipeline(cfg: dict):
         train(model, train_loader, criterion, optimizer, config)
 
         # and test its final performance
-        test(model, test_loader)
+        test(model, test_loader, global_vocab)
 
     return model
 
@@ -60,7 +63,6 @@ if __name__ == "__main__":
         captions_file=data_location+"/captions.txt",
         transforms=transforms,
         embed_size=300,
-        vocab_size=len(dataset.vocab),
         attention_dim=256,
         encoder_dim=2048,
         decoder_dim=512,

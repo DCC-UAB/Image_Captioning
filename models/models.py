@@ -1,4 +1,6 @@
+import torch
 import torch.nn as nn
+import torchvision.models as models
 
 
 # Image Encoder
@@ -97,7 +99,7 @@ class DecoderRNN(nn.Module):
 
         return preds, alphas
 
-    def generate_caption(self, features, max_len=20, vocab=None):
+    def generate_caption(self, features, max_len=20, vocab=None, device='cuda'):
         # Inference part
         # Given the image features generate the captions
 

@@ -4,7 +4,7 @@ from utils.utils import *
 from nltk.translate.bleu_score import sentence_bleu
 
 
-def test(model, test_loader, device="cuda", save: bool = True):
+def test(model, test_loader, vocab, device="cuda", save: bool = True):
     # Run the model on some test examples
     with torch.no_grad():
         acc_score, total = 0, 0
