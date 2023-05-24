@@ -1,7 +1,8 @@
 import wandb
 import torch
 
-def test(model, test_loader, device="cuda", save:bool= True):
+
+def test(model, test_loader, device="cuda", save: bool = True):
     # Run the model on some test examples
     with torch.no_grad():
         correct, total = 0, 0

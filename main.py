@@ -23,40 +23,48 @@ torch.cuda.manual_seed_all(hash("so runs are repeatable") % 2**32 - 1)
 # Device configuration
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# remove slow mirror from list of MNIST mirrors
-torchvision.datasets.MNIST.mirrors = [mirror for mirror in torchvision.datasets.MNIST.mirrors
-                                      if not mirror.startswith("http://yann.lecun.com")]
+# Data location
+data_location = "./data"
 
 
-
-
-def model_pipeline(cfg:dict) -> None:
+def model_pipeline(cfg: dict):
     # tell wandb to get started
     with wandb.init(project="pytorch-demo", config=cfg):
-      # access all HPs through wandb.config, so logging matches execution!
-      config = wandb.config
+        # access all HPs through wandb.config, so logging matches execution!
+        config = wandb.config
 
-      # make the model, data, and optimization problem
-      model, train_loader, test_loader, criterion, optimizer = make(config)
+        # make the model, data, and optimization problem
+        model, train_loader, test_loader, criterion, optimizer = make(config)
 
-      # and use them to train the model
-      train(model, train_loader, criterion, optimizer, config)
+        # and use them to train the model
+        train(model, train_loader, criterion, optimizer, config)
 
-      # and test its final performance
-      test(model, test_loader)
+        # and test its final performance
+        test(model, test_loader)
 
     return model
+
 
 if __name__ == "__main__":
     wandb.login()
 
-    config = dict(
-        epochs=5,
-        classes=10,
-        kernels=[16, 32],
-        batch_size=128,
-        learning_rate=5e-3,
-        dataset="MNIST",
-        architecture="CNN")
-    model = model_pipeline(config)
+    transforms = T.Compose([
+        T.Resize(226),
+        T.RandomCrop(224),
+        T.ToTensor(),
+        T.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+    ])
 
+    config = dict(
+        root_dir=data_location+"/Images",
+        captions_file=data_location+"/captions.txt",
+        transforms=transforms,
+        embed_size=300,
+        vocab_size=len(dataset.vocab),
+        attention_dim=256,
+        encoder_dim=2048,
+        decoder_dim=512,
+        epochs=25,
+        learning_rate=3e-4)
+
+    model = model_pipeline(config)
