@@ -15,6 +15,7 @@ from tqdm.auto import tqdm
 
 # Global variables
 global global_vocab
+global device
 
 # Ensure deterministic behavior
 torch.backends.cudnn.deterministic = True
@@ -40,7 +41,7 @@ def model_pipeline(cfg: dict):
         # generate_and_dump_dataset(config.root_dir, config.captions_file, config.transforms)
 
         # make the model, data, and optimization problem
-        model, train_loader, test_loader, criterion, optimizer = make(config)
+        model, train_loader, test_loader, criterion, optimizer = make(config, device)
 
         # and use them to train the model
         train(model, train_loader, criterion, optimizer, config)
@@ -70,6 +71,7 @@ if __name__ == "__main__":
         encoder_dim=2048,
         decoder_dim=512,
         epochs=25,
-        learning_rate=3e-4)
+        learning_rate=3e-4,
+        batch_size=256)
 
     model = model_pipeline(config)

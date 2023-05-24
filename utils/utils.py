@@ -35,7 +35,7 @@ def flickr_train_test_split(dataset, train_size):
 
 
 # Make initializations
-def make(config, device="cuda"):
+def make(config, device='cuda'):
     # Make the data
     dataset = joblib.load("./processed_dataset.joblib")
 
@@ -112,6 +112,7 @@ class FlickrDataset(Dataset):
     def __init__(self, root_dir, captions_file, transform=None, freq_threshold=5):
         self.root_dir = root_dir
         self.df = pd.read_csv(captions_file)
+        self.df.reset_index(drop=True, inplace=True)
         self.transform = transform
 
         # Get image and caption column from the dataframe
