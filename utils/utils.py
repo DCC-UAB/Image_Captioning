@@ -6,7 +6,10 @@ import torch
 import torch.nn 
 import torchvision
 import torchvision.transforms as transforms
+from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import Dataset, DataLoader
+import os
+from PIL import Image
 from models.models import *    
 
 def get_data(slice=1, train=True):
@@ -125,3 +128,48 @@ class FlickrDataset(Dataset):
         caption_vec += [self.vocab.stoi["<EOS>"]]
         
         return img, torch.tensor(caption_vec)
+    
+class CapsCollate:
+    """
+    Collate to apply the padding to the captions with dataloader
+    """
+    def __init__(self,pad_idx,batch_first=False):
+        self.pad_idx = pad_idx
+        self.batch_first = batch_first
+    
+    def __call__(self,batch):
+        imgs = [item[0].unsqueeze(0) for item in batch]
+        imgs = torch.cat(imgs,dim=0)
+        
+        targets = [item[1] for item in batch]
+        targets = pad_sequence(targets, batch_first=self.batch_first, padding_value=self.pad_idx)
+        return imgs,targets
+
+def get_data_loader(dataset,batch_size,shuffle=False,num_workers=1):
+    """
+    Returns torch dataloader for the flicker8k dataset
+    
+    Parameters
+    -----------
+    dataset: FlickrDataset
+        custom torchdataset named FlickrDataset 
+    batch_size: int
+        number of data to load in a particular batch
+    shuffle: boolean,optional;
+        should shuffle the datasests (default is False)
+    num_workers: int,optional
+        numbers of workers to run (default is 1)  
+    """
+
+    pad_idx = dataset.vocab.stoi["<PAD>"]
+    collate_fn = CapsCollate(pad_idx=pad_idx,batch_first=True)
+
+    data_loader = DataLoader(
+        dataset=dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        num_workers=num_workers,
+        collate_fn=collate_fn
+    )
+
+    return data_loader

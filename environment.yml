@@ -16,3 +16,5 @@ dependencies:
   - wandb
   - onnxruntime
   - ipykernel
+  - spacy
+  - joblib
