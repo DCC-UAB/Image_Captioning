@@ -24,7 +24,7 @@ def train(model, data_loader, criterion, optimizer, config, num_epochs=25):
                 train_log(loss, example_ct, epoch)
 
         # save the latest model
-        save_model(model, epoch)
+        save_model(model, epoch, config)
 
 
 def train_batch(image, captions, model, vocab_size, optimizer, criterion, device='cuda'):

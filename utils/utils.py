@@ -162,16 +162,6 @@ class CapsCollate:
         return imgs, targets
 
 
-def get_data(train, root_dir, captions_file, transforms=None):
-    dataset = FlickrDataset(
-        root_dir=root_dir,
-        captions_file=captions_file,
-        transform=transforms,
-        train=train
-    )
-    return dataset
-
-
 def get_data_loader(dataset, batch_size, shuffle=False, num_workers=1):
     """
     Returns torch dataloader for the flicker8k dataset

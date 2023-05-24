@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="992c394b-0ea0-470d-891f-7b60c3ee65d9" name="Changes" comment="Big dataloader error fixed">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_19_5_2023_8_50__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_19_5_2023_8_50__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_19_5_2023_9_31__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_19_5_2023_9_31__Changes_.xml" afterDir="false" />
+    <list default="true" id="992c394b-0ea0-470d-891f-7b60c3ee65d9" name="Changes" comment="Done small cleaning">
+      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/environment.yml" beforeDir="false" afterPath="$PROJECT_DIR$/environment.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,11 +97,8 @@
       <module name="xnap-project-matcad_grup_10" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="/anaconda/envs/xnap-example/bin/python" />
-      <option name="SDK_NAME" value="Remote Python 3.8.16 (sftp://xnmaster@ml-lab-f16b9785-93b3-4cf9-952d-b7314da22250.westeurope.cloudapp.azure.com:49636/anaconda/envs/xnap-example/bin/python)" />
+      <option name="SDK_HOME" value="C:\Users\donai\Anaconda3\envs\xnap-example\python.exe" />
+      <option name="SDK_NAME" value="xnap-example" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -135,6 +135,9 @@
       <workItem from="1684686112117" duration="1743000" />
       <workItem from="1684764879871" duration="1237000" />
       <workItem from="1684914456602" duration="768000" />
+      <workItem from="1684920645485" duration="670000" />
+      <workItem from="1684938540818" duration="3920000" />
+      <workItem from="1684949648260" duration="2945000" />
     </task>
     <task id="LOCAL-00001" summary="Notebooks changed">
       <created>1684315314726</created>
@@ -164,7 +167,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684914596144</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Done small cleaning">
+      <created>1684920699851</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1684920699851</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -185,7 +195,8 @@
     <MESSAGE value="Notebooks changed" />
     <MESSAGE value="Notebook-understanding completion" />
     <MESSAGE value="Big dataloader error fixed" />
-    <option name="LAST_COMMIT_MESSAGE" value="Big dataloader error fixed" />
+    <MESSAGE value="Done small cleaning" />
+    <option name="LAST_COMMIT_MESSAGE" value="Done small cleaning" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/xnap_project_matcad_grup_10$main.coverage" NAME="main Coverage Results" MODIFIED="1684261858594" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
