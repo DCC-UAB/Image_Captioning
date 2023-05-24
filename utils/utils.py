@@ -109,17 +109,10 @@ class FlickrDataset(Dataset):
     FlickrDataset
     """
 
-    def __init__(self, root_dir, captions_file, transform=None, train=True, split=0.8, freq_threshold=5):
+    def __init__(self, root_dir, captions_file, transform=None, freq_threshold=5):
         self.root_dir = root_dir
         self.df = pd.read_csv(captions_file)
         self.transform = transform
-        self.train = train
-
-        # Train-test split split/1 train, 1-split/1 test
-        if self.train:
-            self.df = self.df.head(int(len(self.df)*split))
-        else:
-            self.df = self.df.tail(int(len(self.df)*(1-split)))
 
         # Get image and caption column from the dataframe
         self.imgs = self.df["image"]
