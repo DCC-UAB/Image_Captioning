@@ -5,34 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dbc36743-b45d-4e00-8550-91d2572e1f11" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jupyter-settings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_19_5_2023_8_50_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_19_5_2023_8_50__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_19_5_2023_9_31_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_19_5_2023_9_31__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/xnap-project-matcad_grup_10.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/xnap-project-matcad_grup_10.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/get_dataset.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/image-captioning-with-attention-pytorch.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/image-captioning.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/models.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebook-understanding.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/processed_dataset.joblib" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_trained_model.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/utils.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/visualizations.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SRC/get_dataset.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,7 +46,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1685039744413</updated>
-      <workItem from="1685039747209" duration="1920000" />
+      <workItem from="1685039747209" duration="2534000" />
     </task>
     <servers />
   </component>
