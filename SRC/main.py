@@ -55,7 +55,7 @@ def model_pipeline(cfg: dict):
 
         # Make the loss and optimizer
         criterion = nn.CrossEntropyLoss(ignore_index=vocab.stoi["<PAD>"])
-        optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
+        optimizer = torch.optim.Adam(my_model.parameters(), lr=config.learning_rate)
 
         # and use them to train the model
         train(my_model, train_loader, criterion, optimizer, config)
