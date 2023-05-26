@@ -33,8 +33,7 @@ def flickr_train_test_split(dataset, train_size):
 # Make initializations
 def make_model(config, device='cuda'):
     # Make the data
-    DATA_LOCATION = '../data'
-    dataset = joblib.load(DATA_LOCATION+"/processed_dataset.joblib")
+    dataset = joblib.load(config.DATA_LOCATION+"/processed_dataset.joblib")
 
     train_dataset, test_dataset = flickr_train_test_split(dataset, 0.8)
 
@@ -216,7 +215,7 @@ def get_caps_from(model, features_tensors, device='cuda'):
     return caps, alphas
 
 
-def generate_and_dump_dataset(root_dir, captions_file, transforms):
+def generate_and_dump_dataset(root_dir, captions_file, transforms, DATA_LOCATION):
     # initialize the dataset class
     dataset = FlickrDataset(
         root_dir=root_dir,

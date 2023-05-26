@@ -17,7 +17,7 @@ global global_vocab
 global device
 global DATA_LOCATION
 
-DATA_LOCATION = '../data'
+
 
 # Ensure deterministic behavior
 torch.backends.cudnn.deterministic = True
@@ -37,7 +37,7 @@ def model_pipeline(cfg: dict):
         config = wandb.config
 
         # execute only once to create the dataset
-        # generate_and_dump_dataset(config.root_dir, config.captions_file, config.transforms)
+        # generate_and_dump_dataset(config.root_dir, config.captions_file, config.transforms, cfg.DATA_LOCATION)
 
         # make the model, data, and optimization problem
         model, train_loader, test_loader, criterion, optimizer = make_model(config, device)
@@ -61,6 +61,8 @@ if __name__ == "__main__":
         T.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     ])
 
+    DATA_LOCATION = '../data'
+
     config = dict(
         root_dir=DATA_LOCATION+"/Images",
         captions_file=DATA_LOCATION+"/captions.txt",
@@ -71,6 +73,7 @@ if __name__ == "__main__":
         decoder_dim=512,
         epochs=25,
         learning_rate=3e-4,
-        batch_size=256)
+        batch_size=256,
+        DATA_LOCATION=DATA_LOCATION)
 
     model = model_pipeline(config)
