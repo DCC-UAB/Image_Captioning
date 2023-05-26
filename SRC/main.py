@@ -16,9 +16,11 @@ from models.models import *
 # Global variables
 global device
 
-# Setting CUDA ALLOC split size to 256 to avoid running out of memory
 import os
+# Setting CUDA ALLOC split size to 256 to avoid running out of memory
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:256"
+# Stopping wandb from creating symlinks
+os.environ["WANDB_DISABLE_SYMLINKS"] = "true"
 
 # Ensure deterministic behavior
 torch.backends.cudnn.deterministic = True
