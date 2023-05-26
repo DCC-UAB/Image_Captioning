@@ -14,10 +14,11 @@ from utils.utils import *
 from models.models import *
 
 # Global variables
-global global_vocab
 global device
 
-
+# Setting CUDA ALLOC split size to 256 to avoid running out of memory
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:256"
 
 # Ensure deterministic behavior
 torch.backends.cudnn.deterministic = True
@@ -39,25 +40,35 @@ def model_pipeline(cfg: dict):
         # execute only once to create the dataset
         # generate_and_dump_dataset(config.root_dir, config.captions_file, config.transforms, cfg.DATA_LOCATION)
 
-        # make the data_loaders, and optimizer
-        train_loader, test_loader, criterion, optimizer = make_init(config, device)
+        # Generate Dataset
+        dataset = make_dataset(config)
 
-        # make the model
-        model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
-                           config.decoder_dim).to(device)
+        # make the data_loaders, and optimizer
+        train_loader, test_loader = make_dataloaders(config, dataset)
+
+        # Generate vocab
+        vocab = dataset.vocab
+        config.vocab_size = len(vocab)
+
+        # Get the model
+        my_model = make_model(config, device)
+
+        # Make the loss and optimizer
+        criterion = nn.CrossEntropyLoss(ignore_index=vocab.stoi["<PAD>"])
+        optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
 
         # and use them to train the model
-        train(model, train_loader, criterion, optimizer, config)
+        train(my_model, train_loader, criterion, optimizer, config)
 
         # and test its final performance
-        test(model, test_loader, global_vocab)
+        test(my_model, test_loader, vocab)
 
-    return model
+    return my_model
 
 
 if __name__ == "__main__":
     wandb.login()
-
+    print("Using: ", device)
     transforms = T.Compose([
         T.Resize(226),
         T.RandomCrop(224),
@@ -78,6 +89,8 @@ if __name__ == "__main__":
         epochs=25,
         learning_rate=3e-4,
         batch_size=256,
-        DATA_LOCATION=DATA_LOCATION)
+        DATA_LOCATION=DATA_LOCATION,
+        train_size = 0.05,
+        test_size = 0.05)
 
     model = model_pipeline(config)

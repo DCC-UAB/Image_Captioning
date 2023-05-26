@@ -3,7 +3,7 @@ import wandb
 from utils.utils import *
 
 
-def train(model, data_loader, criterion, optimizer, config, num_epochs=25):
+def train(model, data_loader, criterion, optimizer, config, num_epochs=1): # 25
     # Tell wandb to watch what the model gets up to: gradients, weights, and more!
     wandb.watch(model, criterion, log="all", log_freq=10)
 
@@ -19,8 +19,8 @@ def train(model, data_loader, criterion, optimizer, config, num_epochs=25):
             example_ct += len(image)
             batch_ct += 1
 
-            # Report metrics every 25th batch
-            if ((batch_ct + 1) % 25) == 0:
+            # Report metrics every 1th batch
+            if ((batch_ct + 1) % 1) == 0:
                 train_log(loss, example_ct, epoch)
 
         # save the latest model

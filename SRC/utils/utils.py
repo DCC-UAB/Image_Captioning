@@ -10,11 +10,12 @@ from PIL import Image
 import joblib
 from copy import deepcopy
 from sklearn.model_selection import train_test_split
+from SRC.models.models import *
 
 
-def flickr_train_test_split(dataset, train_size):
+def flickr_train_test_split(dataset, train_size, test_size):
     # Splits dataset with same vocabulary
-    train_X, test_X = train_test_split(dataset.df, train_size=train_size)
+    train_X, test_X = train_test_split(dataset.df, train_size=train_size, test_size=test_size)
 
     train_dataset = deepcopy(dataset)
     test_dataset = deepcopy(dataset)
@@ -31,27 +32,26 @@ def flickr_train_test_split(dataset, train_size):
 
     return train_dataset, test_dataset
 
+def make_dataset(config):
+    dataset = joblib.load(config.DATA_LOCATION + "/processed_dataset.joblib")
+    return dataset
 
 # Make initializations
-def make_init(config, device='cuda'):
-    # Make the data
-    dataset = joblib.load(config.DATA_LOCATION+"/processed_dataset.joblib")
-
-    train_dataset, test_dataset = flickr_train_test_split(dataset, 0.8)
-
-    global global_vocab
-    global_vocab = dataset.vocab
-
-    config.vocab_size = len(global_vocab)
+def make_dataloaders(config, dataset):
+    train_dataset, test_dataset = flickr_train_test_split(dataset, config.train_size, config.test_size)
 
     train_loader = get_data_loader(train_dataset, batch_size=config.batch_size)
     test_loader = get_data_loader(test_dataset, batch_size=config.batch_size)
 
-    # Make the loss and optimizer
-    criterion = nn.CrossEntropyLoss(ignore_index=global_vocab.stoi["<PAD>"])
-    optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
+    return train_loader, test_loader
 
-    return train_loader, test_loader, criterion, optimizer
+
+def make_model(config, device='cuda'):
+    # make the model
+    model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
+                           config.decoder_dim).to(device)
+
+    return model
 
 
 class Vocabulary:
@@ -202,12 +202,12 @@ def save_model(model, num_epochs, config):
 
 
 # generate caption
-def get_caps_from(model, features_tensors, device='cuda'):
+def get_caps_from(model, features_tensors, vocab, device='cuda'):
     # generate the caption
     model.eval()
     with torch.no_grad():
         features = model.encoder(features_tensors.to(device))
-        caps, alphas = model.decoder.generate_caption(features, vocab=global_vocab)
+        caps, alphas = model.decoder.generate_caption(features, vocab=vocab)
 
     return caps, alphas
 

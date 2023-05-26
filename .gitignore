@@ -139,3 +139,5 @@ SRC/wandb/
 
 # XML
 *.xml
+
+*.pth
