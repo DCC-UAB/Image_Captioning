@@ -7,7 +7,6 @@
     <list default="true" id="dbc36743-b45d-4e00-8550-91d2572e1f11" name="Changes" comment="Some bug fixes (still not working)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SRC/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/SRC/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SRC/utils/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/SRC/utils/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,7 +117,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/xnap_project_matcad_grup_10$Remoto.coverage" NAME="Remoto Coverage Results" MODIFIED="1685085893570" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SRC" />
-    <SUITE FILE_PATH="coverage/xnap_project_matcad_grup_10$Local.coverage" NAME="Local Coverage Results" MODIFIED="1685087894669" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SRC" />
+    <SUITE FILE_PATH="coverage/xnap_project_matcad_grup_10$Local.coverage" NAME="Local Coverage Results" MODIFIED="1685088924137" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SRC" />
     <SUITE FILE_PATH="coverage/xnap_project_matcad_grup_10$main.coverage" NAME="main Coverage Results" MODIFIED="1684261858594" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
