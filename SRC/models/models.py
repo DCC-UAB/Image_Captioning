@@ -53,13 +53,14 @@ class Attention(nn.Module):
 
 # Attention Decoder
 class DecoderRNN(nn.Module):
-    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, drop_prob=0.3):
+    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, drop_prob=0.3, device='cuda'):
         super().__init__()
 
         # save the model param
         self.vocab_size = vocab_size
         self.attention_dim = attention_dim
         self.decoder_dim = decoder_dim
+        self.device = device
 
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.attention = Attention(encoder_dim, decoder_dim, attention_dim)
@@ -85,8 +86,8 @@ class DecoderRNN(nn.Module):
         batch_size = captions.size(0)
         num_features = features.size(1)
 
-        preds = torch.zeros(batch_size, seq_length, self.vocab_size).to(device)
-        alphas = torch.zeros(batch_size, seq_length, num_features).to(device)
+        preds = torch.zeros(batch_size, seq_length, self.vocab_size).to(self.device)
+        alphas = torch.zeros(batch_size, seq_length, num_features).to(self.device)
 
         for s in range(seq_length):
             alpha, context = self.attention(features, h)
@@ -110,7 +111,7 @@ class DecoderRNN(nn.Module):
         alphas = []
 
         # starting input
-        word = torch.tensor(vocab.stoi['<SOS>']).view(1, -1).to(device)
+        word = torch.tensor(vocab.stoi['<SOS>']).view(1, -1).to(self.device)
         embeds = self.embedding(word)
 
         captions = []
@@ -151,7 +152,7 @@ class DecoderRNN(nn.Module):
 
 # Full model
 class EncoderDecoder(nn.Module):
-    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, drop_prob=0.3):
+    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, drop_prob=0.3, device='cuda'):
         super().__init__()
         self.encoder = EncoderCNN()
         self.decoder = DecoderRNN(
@@ -159,7 +160,8 @@ class EncoderDecoder(nn.Module):
             vocab_size=vocab_size,
             attention_dim=attention_dim,
             encoder_dim=encoder_dim,
-            decoder_dim=decoder_dim
+            decoder_dim=decoder_dim,
+            device=device
         )
 
     def forward(self, images, captions):

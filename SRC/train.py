@@ -15,7 +15,7 @@ def train(model, data_loader, criterion, optimizer, config, num_epochs=1): # 25
     for epoch in tqdm(range(1, num_epochs + 1)):
         for idx, (image, captions) in enumerate(iter(data_loader)):
 
-            loss = train_batch(image, captions, model, config.vocab_size, optimizer, criterion)
+            loss = train_batch(image, captions, model, config.vocab_size, optimizer, criterion, device=config.device)
             example_ct += len(image)
             batch_ct += 1
 
@@ -28,6 +28,7 @@ def train(model, data_loader, criterion, optimizer, config, num_epochs=1): # 25
 
 
 def train_batch(image, captions, model, vocab_size, optimizer, criterion, device='cuda'):
+
     image, captions = image.to(device), captions.to(device)
 
     # Zero the gradients.

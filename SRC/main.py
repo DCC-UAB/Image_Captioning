@@ -68,7 +68,9 @@ def model_pipeline(cfg: dict):
 
 if __name__ == "__main__":
     wandb.login()
+
     print("Using: ", device)
+
     transforms = T.Compose([
         T.Resize(226),
         T.RandomCrop(224),
@@ -81,6 +83,7 @@ if __name__ == "__main__":
     config = dict(
         root_dir=DATA_LOCATION+"/Images",
         captions_file=DATA_LOCATION+"/captions.txt",
+        device=device,
         transforms=transforms,
         embed_size=300,
         attention_dim=256,

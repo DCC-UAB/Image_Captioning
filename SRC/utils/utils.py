@@ -49,7 +49,7 @@ def make_dataloaders(config, dataset):
 def make_model(config, device='cuda'):
     # make the model
     model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
-                           config.decoder_dim).to(device)
+                           config.decoder_dim, device=device).to(device)
 
     return model
 
