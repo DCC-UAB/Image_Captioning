@@ -130,3 +130,9 @@ dmypy.json
 
 # Data
 /data
+
+# Wandb
+SRC/wandb/
+
+# Idea
+.idea/
