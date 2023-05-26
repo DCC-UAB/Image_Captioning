@@ -10,6 +10,7 @@ from PIL import Image
 import joblib
 from copy import deepcopy
 from sklearn.model_selection import train_test_split
+from SRC.models.models import *
 
 
 def flickr_train_test_split(dataset, train_size):
@@ -33,25 +34,36 @@ def flickr_train_test_split(dataset, train_size):
 
 
 # Make initializations
-def make_init(config, device='cuda'):
+def make_dataloaders(config):
     # Make the data
     dataset = joblib.load(config.DATA_LOCATION+"/processed_dataset.joblib")
 
-    train_dataset, test_dataset = flickr_train_test_split(dataset, 0.8)
+    train_dataset, test_dataset = flickr_train_test_split(dataset, 0.05)
+
+    train_loader = get_data_loader(train_dataset, batch_size=config.batch_size)
+    test_loader = get_data_loader(test_dataset, batch_size=config.batch_size)
+
+    return train_loader, test_loader
+
+def get_vocab_size(config):
+    # Returns vocab size and sets global vocab
+    dataset = joblib.load(config.DATA_LOCATION + "/processed_dataset.joblib")
 
     global global_vocab
     global_vocab = dataset.vocab
 
-    config.vocab_size = len(global_vocab)
+    return len(global_vocab)
 
-    train_loader = get_data_loader(train_dataset, batch_size=config.batch_size)
-    test_loader = get_data_loader(test_dataset, batch_size=config.batch_size)
+def make_model(config, device='cuda'):
+    # make the model
+    model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
+                           config.decoder_dim).to(device)
 
     # Make the loss and optimizer
     criterion = nn.CrossEntropyLoss(ignore_index=global_vocab.stoi["<PAD>"])
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
 
-    return train_loader, test_loader, criterion, optimizer
+    return model, criterion, optimizer
 
 
 class Vocabulary:

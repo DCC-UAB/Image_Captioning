@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torchvision.models as models
+import torch.nn.functional as F
 
 
 # Image Encoder
@@ -71,7 +72,7 @@ class DecoderRNN(nn.Module):
         self.fcn = nn.Linear(decoder_dim, vocab_size)
         self.drop = nn.Dropout(drop_prob)
 
-    def forward(self, features, captions):
+    def forward(self, features, captions, device='cuda'):
 
         # vectorize the caption
         embeds = self.embedding(captions)

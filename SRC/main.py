@@ -17,7 +17,9 @@ from models.models import *
 global global_vocab
 global device
 
-
+# Setting CUDA ALLOC split size to 256 to avoid running out of memory
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:256"
 
 # Ensure deterministic behavior
 torch.backends.cudnn.deterministic = True
@@ -40,19 +42,21 @@ def model_pipeline(cfg: dict):
         # generate_and_dump_dataset(config.root_dir, config.captions_file, config.transforms, cfg.DATA_LOCATION)
 
         # make the data_loaders, and optimizer
-        train_loader, test_loader, criterion, optimizer = make_init(config, device)
+        train_loader, test_loader = make_dataloaders(config)
 
-        # make the model
-        model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
-                           config.decoder_dim).to(device)
+        # Sets vocab and returns vocab size
+        config.vocab_size = get_vocab_size(config)
+
+        # Get the model
+        my_model, criterion, optimizer = make_model(config, device)
 
         # and use them to train the model
-        train(model, train_loader, criterion, optimizer, config)
+        train(my_model, train_loader, criterion, optimizer, config)
 
         # and test its final performance
-        test(model, test_loader, global_vocab)
+        test(my_model, test_loader, global_vocab)
 
-    return model
+    return my_model
 
 
 if __name__ == "__main__":
