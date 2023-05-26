@@ -61,7 +61,7 @@ def model_pipeline(cfg: dict):
         train(my_model, train_loader, criterion, optimizer, config)
 
         # and test its final performance
-        test(my_model, test_loader, vocab)
+        test(my_model, test_loader, vocab, device)
 
     return my_model
 
@@ -89,11 +89,11 @@ if __name__ == "__main__":
         attention_dim=256,
         encoder_dim=2048,
         decoder_dim=512,
-        epochs=25,
+        epochs=1,
         learning_rate=3e-4,
         batch_size=256,
         DATA_LOCATION=DATA_LOCATION,
-        train_size = 0.05,
-        test_size = 0.05)
+        train_size = 0.01,
+        test_size = 0.01)
 
     model = model_pipeline(config)

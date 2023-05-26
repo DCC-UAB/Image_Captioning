@@ -11,7 +11,7 @@ def test(model, test_loader, vocab, device="cuda", save: bool = True):
         for images, captions in test_loader:
             images, captions = images.to(device), captions.to(device)
             images = images[0].detach().clone()
-            predicted, _ = get_caps_from(model, images.unsqueeze(0), vocab=vocab)
+            predicted, _ = get_caps_from(model, images.unsqueeze(0), vocab=vocab, device=device)
             acc_score += sentence_bleu(captions, predicted)
             total += 1
 
