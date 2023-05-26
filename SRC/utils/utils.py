@@ -10,7 +10,7 @@ from PIL import Image
 import joblib
 from copy import deepcopy
 from sklearn.model_selection import train_test_split
-from SRC.models.models import *
+
 
 def flickr_train_test_split(dataset, train_size):
     # Splits dataset with same vocabulary
@@ -20,18 +20,20 @@ def flickr_train_test_split(dataset, train_size):
     test_dataset = deepcopy(dataset)
 
     train_dataset.df = train_X
-    train_dataset.images = train_X['image']
+    train_dataset.df.reset_index(drop=True, inplace=True)
+    train_dataset.imgs = train_X['image']
     train_dataset.captions = train_X['caption']
 
     test_dataset.df = test_X
-    test_dataset.images = test_X['image']
+    test_dataset.df.reset_index(drop=True, inplace=True)
+    test_dataset.imgs = test_X['image']
     test_dataset.captions = test_X['caption']
 
     return train_dataset, test_dataset
 
 
 # Make initializations
-def make_model(config, device='cuda'):
+def make_init(config, device='cuda'):
     # Make the data
     dataset = joblib.load(config.DATA_LOCATION+"/processed_dataset.joblib")
 
@@ -45,15 +47,11 @@ def make_model(config, device='cuda'):
     train_loader = get_data_loader(train_dataset, batch_size=config.batch_size)
     test_loader = get_data_loader(test_dataset, batch_size=config.batch_size)
 
-    # Make the model
-    model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
-                           config.decoder_dim).to(device)
-
     # Make the loss and optimizer
     criterion = nn.CrossEntropyLoss(ignore_index=global_vocab.stoi["<PAD>"])
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
 
-    return model, train_loader, test_loader, criterion, optimizer
+    return train_loader, test_loader, criterion, optimizer
 
 
 class Vocabulary:
@@ -108,7 +106,6 @@ class FlickrDataset(Dataset):
     def __init__(self, root_dir, captions_file, transform=None, freq_threshold=5):
         self.root_dir = root_dir
         self.df = pd.read_csv(captions_file)
-        self.df.reset_index(drop=True, inplace=True)
         self.transform = transform
 
         # Get image and caption column from the dataframe

@@ -11,6 +11,7 @@ import torchvision.transforms as T
 from train import *
 from test import *
 from utils.utils import *
+from models.models import *
 
 # Global variables
 global global_vocab
@@ -39,8 +40,12 @@ def model_pipeline(cfg: dict):
         # execute only once to create the dataset
         # generate_and_dump_dataset(config.root_dir, config.captions_file, config.transforms, cfg.DATA_LOCATION)
 
-        # make the model, data, and optimization problem
-        model, train_loader, test_loader, criterion, optimizer = make_model(config, device)
+        # make the data_loaders, and optimizer
+        train_loader, test_loader, criterion, optimizer = make_init(config, device)
+
+        # make the model
+        model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
+                           config.decoder_dim).to(device)
 
         # and use them to train the model
         train(model, train_loader, criterion, optimizer, config)
