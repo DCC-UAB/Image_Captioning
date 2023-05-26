@@ -32,9 +32,9 @@ def flickr_train_test_split(dataset, train_size):
 
 
 # Make initializations
-def make(config, device='cuda'):
+def make_model(config, device='cuda'):
     # Make the data
-    dataset = joblib.load("./processed_dataset.joblib")
+    dataset = joblib.load(DATA_PATH+"/processed_dataset.joblib")
 
     train_dataset, test_dataset = flickr_train_test_split(dataset, 0.8)
 
