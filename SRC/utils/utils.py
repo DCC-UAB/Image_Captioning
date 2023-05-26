@@ -7,11 +7,10 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import Dataset, DataLoader
 import os
 from PIL import Image
-from models.models import *
 import joblib
 from copy import deepcopy
 from sklearn.model_selection import train_test_split
-
+from SRC.models.models import *
 
 def flickr_train_test_split(dataset, train_size):
     # Splits dataset with same vocabulary
@@ -34,7 +33,8 @@ def flickr_train_test_split(dataset, train_size):
 # Make initializations
 def make_model(config, device='cuda'):
     # Make the data
-    dataset = joblib.load(DATA_PATH+"/processed_dataset.joblib")
+    DATA_LOCATION = '../data'
+    dataset = joblib.load(DATA_LOCATION+"/processed_dataset.joblib")
 
     train_dataset, test_dataset = flickr_train_test_split(dataset, 0.8)
 
