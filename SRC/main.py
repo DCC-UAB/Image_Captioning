@@ -16,7 +16,6 @@ from models.models import *
 # Global variables
 global global_vocab
 global device
-global DATA_LOCATION
 
 
 

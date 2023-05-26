@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 
-
 # show the tensor image
 def show_image(img, title=None):
     """Imshow for Tensor."""
