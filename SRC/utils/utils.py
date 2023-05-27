@@ -42,7 +42,7 @@ def make_dataloaders(config, dataset):
     train_dataset, test_dataset = flickr_train_test_split(dataset, config.train_size, config.test_size)
 
     train_loader = get_data_loader(train_dataset, batch_size=config.batch_size)
-    test_loader = get_data_loader(test_dataset, batch_size=config.batch_size)
+    test_loader = get_data_loader(test_dataset, batch_size=config.test_batch_size)
 
     return train_loader, test_loader
 

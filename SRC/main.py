@@ -48,7 +48,7 @@ def model_pipeline(cfg: dict):
 
         # make the data_loaders, and optimizer
         train_loader, test_loader = make_dataloaders(config, dataset)
-        
+
         # Generate vocab
         vocab = dataset.vocab
         config.vocab_size = len(vocab)
@@ -64,7 +64,7 @@ def model_pipeline(cfg: dict):
         train(my_model, train_loader, criterion, optimizer, config, save=True)
 
         # and test its final performance
-        test(my_model, test_loader, vocab, device)
+        test(my_model, test_loader, vocab, config, device)
 
     return my_model
 
@@ -95,8 +95,9 @@ if __name__ == "__main__":
         epochs=1,
         learning_rate=3e-4,
         batch_size=256,
+        test_batch_size = 256,
         DATA_LOCATION=DATA_LOCATION,
-        train_size = 0.007,
-        test_size = 0.007)
+        train_size = 0.8,
+        test_size = 0.2)
 
     model = model_pipeline(config)

@@ -4,7 +4,7 @@ from utils.utils import *
 from nltk.translate.bleu_score import sentence_bleu
 
 
-def test(model, test_loader, vocab, device="cuda"):
+def test(model, test_loader, vocab, config, device="cuda"):
     # Run the model on some test examples
     with torch.no_grad():
         acc_score, total = 0, 0
@@ -19,7 +19,7 @@ def test(model, test_loader, vocab, device="cuda"):
             if ((total + 1) % 1) == 0:
                 print("Batch:", total, "\nAcc_score = ", 100*acc_score/total)
 
-        print(f"Mean BLEU score of the model on the {total} " +
+        print(f"Mean BLEU score of the model on the {total*config.test_batch_size} " +
               f"test images: {acc_score / total * 100}%")
         
         wandb.log({"test_mean_bleu": acc_score / total * 100})
