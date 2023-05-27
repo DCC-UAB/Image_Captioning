@@ -24,16 +24,7 @@ def flickr_train_test_split(dataset, train_size):
     # Splitting dataset
     dataset.df = dataset.df.sort_values(by='image') # Grouping each img in 5 rows
     train_X = dataset.df.iloc[:to_train]
-    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
-    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
-    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
-    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~ (+100 REMOVE)
-    test_X = dataset.df.iloc[to_train:to_train+100] #~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
-    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
-    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
-    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
-    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
-
+    test_X = dataset.df.iloc[to_train:]
 
     # Creating the datasets
     train_dataset = deepcopy(dataset)
@@ -264,13 +255,15 @@ def load_ED_model(model_path):
 def test_model_performance(model, test_loader, device, vocab, epoch, config):
     with torch.no_grad():
         dataiter = iter(deepcopy(test_loader))
-        img, _ = next(dataiter)
+        img, real_captions = next(dataiter)
         features = model.encoder(img[0:1].to(device))
         caps, alphas = model.decoder.generate_caption(features, vocab=vocab)
         caption = ' '.join(caps)
 
-        # Save img[0] and caption (df?)
+        # Saving
         joblib.dump(img[0], config.DATA_LOCATION+'/logs'+'/img_epoch_' + str(epoch) + '.joblib')
         joblib.dump(caption, config.DATA_LOCATION+'/logs'+'/caption_epoch_' + str(epoch) + '.joblib')
+        joblib.dump(caps, config.DATA_LOCATION + '/logs' + '/caps_epoch_' + str(epoch) + '.joblib')
+        joblib.dump(alphas, config.DATA_LOCATION+ '/logs' + '/aphas_epoch_' + str(epoch) + '.joblib')
 
 
