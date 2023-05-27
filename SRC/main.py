@@ -44,10 +44,11 @@ def model_pipeline(cfg: dict):
 
         # Generate Dataset
         dataset = make_dataset(config)
+        dataset.spacy_eng = spacy.load("en_core_web_sm")
 
         # make the data_loaders, and optimizer
         train_loader, test_loader = make_dataloaders(config, dataset)
-
+        
         # Generate vocab
         vocab = dataset.vocab
         config.vocab_size = len(vocab)

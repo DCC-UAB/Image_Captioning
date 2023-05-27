@@ -11,6 +11,7 @@ import joblib
 from copy import deepcopy
 from sklearn.model_selection import train_test_split
 from SRC.models.models import *
+import time
 
 
 def flickr_train_test_split(dataset, train_size, test_size):
@@ -64,13 +65,12 @@ class Vocabulary:
         self.stoi = {v: k for k, v in self.itos.items()}
 
         self.freq_threshold = freq_threshold
-
     def __len__(self):
         return len(self.itos)
 
     @staticmethod
-    def tokenize(text):
-        spacy_eng = spacy.load("en_core_web_sm")
+    def tokenize(text, spacy_eng):
+
         return [token.text.lower() for token in spacy_eng.tokenizer(text)]
 
     def build_vocab(self, sentence_list):
@@ -83,7 +83,7 @@ class Vocabulary:
             i += 1
             if not (i % 100):
                 print(i, "Iterations done out of", length)
-            for word in self.tokenize(sentence):
+            for word in self.tokenize(sentence, self.spacy_eng):
                 frequencies[word] += 1
 
                 # add the word to the vocab if it reaches minum frequecy threshold
@@ -92,9 +92,10 @@ class Vocabulary:
                     self.itos[idx] = word
                     idx += 1
 
-    def numericalize(self, text):
+    def numericalize(self, text, spacy_eng):
         """ For each word in the text corresponding index token for that word form the vocab built as list """
-        tokenized_text = self.tokenize(text)
+        tokenized_text = self.tokenize(text, spacy_eng)
+
         return [self.stoi[token] if token in self.stoi else self.stoi["<UNK>"] for token in tokenized_text]
 
 
@@ -115,6 +116,7 @@ class FlickrDataset(Dataset):
         # Initialize vocabulary and build vocab
         self.vocab = Vocabulary(freq_threshold)
         self.vocab.build_vocab(self.captions.tolist())
+        self.spacy_eng = spacy.load("en_core_web_sm")
 
     def __len__(self):
         return len(self.df)
@@ -132,7 +134,7 @@ class FlickrDataset(Dataset):
         # numericalize the caption text
         caption_vec = []
         caption_vec += [self.vocab.stoi["<SOS>"]]
-        caption_vec += self.vocab.numericalize(caption)
+        caption_vec += self.vocab.numericalize(caption, self.spacy_eng)
         caption_vec += [self.vocab.stoi["<EOS>"]]
 
         return img, torch.tensor(caption_vec)
