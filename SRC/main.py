@@ -59,11 +59,53 @@ def model_pipeline(cfg: dict):
         criterion = nn.CrossEntropyLoss(ignore_index=vocab.stoi["<PAD>"])
         optimizer = torch.optim.Adam(my_model.parameters(), lr=config.learning_rate)
 
-        # and use them to train the model
-        train(my_model, train_loader, criterion, optimizer, config, save=True)
+        train_loss_arr_epoch = []  # Mean of the losses of the last epoch
+        test_loss_arr_epoch = []
+        acc_arr_epoch = []
 
-        # and test its final performance
-        test(my_model, test_loader, vocab, config, device)
+        train_loss_arr_batch = [] # Losses of the batches
+        test_loss_arr_batch = []
+        acc_arr_batch = []
+
+        for epoch in tqdm(range(1, config.epochs + 1)):
+            # Training the model
+            train_loss_arr_aux = train(my_model, train_loader, criterion, optimizer, config, epoch)
+
+            my_model.eval()
+            # Testing
+            acc_arr_aux, test_loss_arr_aux = test(my_model, test_loader, criterion, vocab, config, device)
+
+            # Check how model performs
+            test_model_performance(my_model, test_loader, device, vocab, epoch, config)
+
+            my_model.train()
+
+            # Logging data for vizz
+            train_loss_arr_epoch.append(sum(train_loss_arr_aux) / len(train_loss_arr_aux))
+            test_loss_arr_epoch.append(sum(test_loss_arr_aux) / len(test_loss_arr_aux))
+
+            train_loss_arr_batch += train_loss_arr_aux
+            test_loss_arr_batch += test_loss_arr_aux
+
+            acc_arr_epoch.append(sum(acc_arr_aux) / len(acc_arr_aux))
+            acc_arr_batch += acc_arr_aux
+
+
+        epoch_df = pd.DataFrame([train_loss_arr_epoch, test_loss_arr_epoch, acc_arr_epoch],
+                                            columns=['epoch_' + str(i) for i in range(len(train_loss_arr_epoch))],
+                                            index=['train_loss', 'test_loss' ,'test_acc'])
+        loss_batch_df = pd.DataFrame([train_loss_arr_batch],
+                                            columns=['batch_' + str(i) for i in range(len(train_loss_arr_batch))],
+                                            index=['train_loss'])
+        acc_batch_df = pd.DataFrame([acc_arr_batch, test_loss_arr_batch],
+                                            columns=['batch_' + str(i) for i in range(len(acc_arr_batch))],
+                                            index=['test_acc', 'test_loss'])
+
+        if config.save:
+            epoch_df.to_csv(config.DATA_LOCATION+'/logs'+'/epoch_df.csv')
+            loss_batch_df.to_csv(config.DATA_LOCATION+'/logs'+'/loss_batch_df.csv')
+            acc_batch_df.to_csv(config.DATA_LOCATION+'/logs'+'/acc_batch_df.csv')
+            save_model(my_model, config, config.DATA_LOCATION+'/logs'+'/EncoderDecorder_model.pth')
 
     return my_model
 
@@ -91,12 +133,12 @@ if __name__ == "__main__":
         attention_dim=256,
         encoder_dim=2048,
         decoder_dim=512,
-        epochs=1,
+        epochs=2,
         learning_rate=3e-4,
         batch_size=256,
-        test_batch_size = 256,
         DATA_LOCATION=DATA_LOCATION,
-        train_size = 0.8
+        train_size=0.1,
+        save=True
     )
 
 

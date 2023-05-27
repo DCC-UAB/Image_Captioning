@@ -24,7 +24,16 @@ def flickr_train_test_split(dataset, train_size):
     # Splitting dataset
     dataset.df = dataset.df.sort_values(by='image') # Grouping each img in 5 rows
     train_X = dataset.df.iloc[:to_train]
-    test_X = dataset.df.iloc[to_train:]
+    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~ (+100 REMOVE)
+    test_X = dataset.df.iloc[to_train:to_train+100] #~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~ CAREFULL CHANGE ~~~~~~~~~~~~~~
+
 
     # Creating the datasets
     train_dataset = deepcopy(dataset)
@@ -52,7 +61,7 @@ def make_dataloaders(config, dataset):
     train_dataset, test_dataset = flickr_train_test_split(dataset, config.train_size)
 
     train_loader = get_data_loader(train_dataset, batch_size=config.batch_size)
-    test_loader = get_data_loader(test_dataset, batch_size=config.test_batch_size)
+    test_loader = get_data_loader(test_dataset, batch_size = 5)
 
     return train_loader, test_loader
 
@@ -134,11 +143,9 @@ class FlickrDataset(Dataset):
         return len(self.df)
 
     def __getitem__(self, idx):
-
         caption = self.captions[idx]
         img_name = self.imgs[idx]
         img_location = os.path.join(self.root_dir, img_name)
-        t0 = time.time()
         img = Image.open(img_location)
         img = img.convert("RGB")
 
@@ -203,7 +210,7 @@ def get_data_loader(dataset, batch_size, shuffle=False, num_workers=1):
 
 
 # helper function to save the model
-def save_model(model, config):
+def save_model(model, config, model_path):
     model_state = {
         'embed_size': config.embed_size,
         'vocab_size': config.vocab_size,
@@ -213,7 +220,7 @@ def save_model(model, config):
         'state_dict': model.state_dict()
     }
 
-    torch.save(model_state, 'attention_model_state.pth')
+    torch.save(model_state, model_path)
 
 
 # generate caption
@@ -227,7 +234,7 @@ def get_caps_from(model, features_tensors, vocab, device='cuda'):
     return caps, alphas
 
 
-def generate_and_dump_dataset(root_dir, captions_file, transforms, DATA_LOCATION):
+def generate_and_dump_dataset(root_dir, captions_file, transforms, data_location):
     # initialize the dataset class
     dataset = FlickrDataset(
         root_dir=root_dir,
@@ -235,7 +242,7 @@ def generate_and_dump_dataset(root_dir, captions_file, transforms, DATA_LOCATION
         transform=transforms
     )
 
-    joblib.dump(dataset, DATA_LOCATION+"/processed_dataset.joblib")
+    joblib.dump(dataset, data_location+"/processed_dataset.joblib")
 
 
 def load_ED_model(model_path):
@@ -254,5 +261,16 @@ def load_ED_model(model_path):
     return model
 
 
+def test_model_performance(model, test_loader, device, vocab, epoch, config):
+    with torch.no_grad():
+        dataiter = iter(deepcopy(test_loader))
+        img, _ = next(dataiter)
+        features = model.encoder(img[0:1].to(device))
+        caps, alphas = model.decoder.generate_caption(features, vocab=vocab)
+        caption = ' '.join(caps)
+
+        # Save img[0] and caption (df?)
+        joblib.dump(img[0], config.DATA_LOCATION+'/logs'+'/img_epoch_' + str(epoch) + '.joblib')
+        joblib.dump(caption, config.DATA_LOCATION+'/logs'+'/caption_epoch_' + str(epoch) + '.joblib')
 
 
