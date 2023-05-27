@@ -12,6 +12,9 @@ from train import *
 from test import *
 from utils.utils import *
 from models.models import *
+import multiprocessing
+
+
 
 # Global variables
 global device
@@ -46,7 +49,7 @@ def model_pipeline(cfg: dict):
         dataset = make_dataset(config)
 
         # make the data_loaders, and optimizer
-        train_loader, test_loader = make_dataloaders(config, dataset)
+        train_loader, test_loader = make_dataloaders(config, dataset, multiprocessing.cpu_count())
 
         # Generate vocab
         vocab = dataset.vocab

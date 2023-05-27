@@ -57,11 +57,11 @@ def make_dataset(config):
     return dataset
 
 # Make initializations
-def make_dataloaders(config, dataset):
+def make_dataloaders(config, dataset, num_workers):
     train_dataset, test_dataset = flickr_train_test_split(dataset, config.train_size)
 
-    train_loader = get_data_loader(train_dataset, batch_size=config.batch_size)
-    test_loader = get_data_loader(test_dataset, batch_size = 5)
+    train_loader = get_data_loader(train_dataset, batch_size=config.batch_size, num_workers=num_workers)
+    test_loader = get_data_loader(test_dataset, batch_size = 5, num_workers=num_workers)
 
     return train_loader, test_loader
 
