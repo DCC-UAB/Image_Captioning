@@ -18,7 +18,7 @@ global device
 
 import os
 # Setting CUDA ALLOC split size to 256 to avoid running out of memory
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:256"
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
 # Stopping wandb from creating symlinks
 os.environ["WANDB_DISABLE_SYMLINKS"] = "true"
 
@@ -60,7 +60,7 @@ def model_pipeline(cfg: dict):
         optimizer = torch.optim.Adam(my_model.parameters(), lr=config.learning_rate)
 
         # and use them to train the model
-        train(my_model, train_loader, criterion, optimizer, config)
+        train(my_model, train_loader, criterion, optimizer, config, save=True)
 
         # and test its final performance
         test(my_model, test_loader, vocab, device)

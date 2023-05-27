@@ -3,7 +3,7 @@ import wandb
 from utils.utils import *
 
 
-def train(model, data_loader, criterion, optimizer, config, num_epochs=1): # 25
+def train(model, data_loader, criterion, optimizer, config, num_epochs=1, save=False): # 25
     # Tell wandb to watch what the model gets up to: gradients, weights, and more!
     wandb.watch(model, criterion, log="all", log_freq=10)
 
@@ -23,8 +23,9 @@ def train(model, data_loader, criterion, optimizer, config, num_epochs=1): # 25
             if ((batch_ct + 1) % 1) == 0:
                 train_log(loss, example_ct, epoch)
 
+    if save:
         # save the latest model
-        save_model(model, epoch, config)
+        save_model(model, config)
 
 
 def train_batch(image, captions, model, vocab_size, optimizer, criterion, device='cuda'):

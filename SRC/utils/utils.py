@@ -187,9 +187,8 @@ def get_data_loader(dataset, batch_size, shuffle=False, num_workers=1):
 
 
 # helper function to save the model
-def save_model(model, num_epochs, config):
+def save_model(model, config):
     model_state = {
-        'num_epochs': num_epochs,
         'embed_size': config.embed_size,
         'vocab_size': config.vocab_size,
         'attention_dim': config.attention_dim,
@@ -221,3 +220,23 @@ def generate_and_dump_dataset(root_dir, captions_file, transforms, DATA_LOCATION
     )
 
     joblib.dump(dataset, DATA_LOCATION+"/processed_dataset.joblib")
+
+
+def load_ED_model(model_path):
+    # Call: model = load_ED_model('attention_model_state.pth')
+    checkpoint = torch.load(model_path)
+
+    model = EncoderDecoder(
+        embed_size=checkpoint['embed_size'],
+        vocab_size=checkpoint['vocab_size'],
+        attention_dim=checkpoint['attention_dim'],
+        encoder_dim=checkpoint['encoder_dim'],
+        decoder_dim=checkpoint['decoder_dim']
+    )
+    model.load_state_dict(checkpoint['state_dict'])
+
+    return model
+
+
+
+
