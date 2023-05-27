@@ -44,7 +44,6 @@ def model_pipeline(cfg: dict):
 
         # Generate Dataset
         dataset = make_dataset(config)
-        dataset.spacy_eng = spacy.load("en_core_web_sm")
 
         # make the data_loaders, and optimizer
         train_loader, test_loader = make_dataloaders(config, dataset)
@@ -97,7 +96,8 @@ if __name__ == "__main__":
         batch_size=256,
         test_batch_size = 256,
         DATA_LOCATION=DATA_LOCATION,
-        train_size = 0.8,
-        test_size = 0.2)
+        train_size = 0.8
+    )
+
 
     model = model_pipeline(config)

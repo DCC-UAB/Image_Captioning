@@ -14,10 +14,19 @@ from SRC.models.models import *
 import time
 
 
-def flickr_train_test_split(dataset, train_size, test_size):
-    # Splits dataset with same vocabulary
-    train_X, test_X = train_test_split(dataset.df, train_size=train_size, test_size=test_size)
+def flickr_train_test_split(dataset, train_size):
+    # Finding idx of the data to train making sure no img is in train and test at the same time
+    to_train = int(dataset.df.shape[0] * train_size)
 
+    while to_train % 5 != 0:  # While some image still splits into train and test, take more images
+        to_train += 1
+
+    # Splitting dataset
+    dataset.df = dataset.df.sort_values(by='image') # Grouping each img in 5 rows
+    train_X = dataset.df.iloc[:to_train]
+    test_X = dataset.df.iloc[to_train:]
+
+    # Creating the datasets
     train_dataset = deepcopy(dataset)
     test_dataset = deepcopy(dataset)
 
@@ -35,11 +44,12 @@ def flickr_train_test_split(dataset, train_size, test_size):
 
 def make_dataset(config):
     dataset = joblib.load(config.DATA_LOCATION + "/processed_dataset.joblib")
+    dataset.spacy_eng = spacy.load("en_core_web_sm")
     return dataset
 
 # Make initializations
 def make_dataloaders(config, dataset):
-    train_dataset, test_dataset = flickr_train_test_split(dataset, config.train_size, config.test_size)
+    train_dataset, test_dataset = flickr_train_test_split(dataset, config.train_size)
 
     train_loader = get_data_loader(train_dataset, batch_size=config.batch_size)
     test_loader = get_data_loader(test_dataset, batch_size=config.test_batch_size)
@@ -65,6 +75,7 @@ class Vocabulary:
         self.stoi = {v: k for k, v in self.itos.items()}
 
         self.freq_threshold = freq_threshold
+        self.spacy_eng = spacy.load("en_core_web_sm")
     def __len__(self):
         return len(self.itos)
 
@@ -109,6 +120,7 @@ class FlickrDataset(Dataset):
         self.df = pd.read_csv(captions_file)
         self.transform = transform
 
+
         # Get image and caption column from the dataframe
         self.imgs = self.df["image"]
         self.captions = self.df["caption"]
@@ -122,12 +134,14 @@ class FlickrDataset(Dataset):
         return len(self.df)
 
     def __getitem__(self, idx):
+
         caption = self.captions[idx]
         img_name = self.imgs[idx]
         img_location = os.path.join(self.root_dir, img_name)
-        img = Image.open(img_location).convert("RGB")
+        t0 = time.time()
+        img = Image.open(img_location)
+        img = img.convert("RGB")
 
-        # apply the transformation to the image
         if self.transform is not None:
             img = self.transform(img)
 
