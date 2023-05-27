@@ -16,7 +16,6 @@ from models.models import *
 # Global variables
 global device
 
-import os
 # Setting CUDA ALLOC split size to 256 to avoid running out of memory
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
 # Stopping wandb from creating symlinks
@@ -53,7 +52,8 @@ def model_pipeline(cfg: dict):
         config.vocab_size = len(vocab)
 
         # Get the model
-        my_model = make_model(config, device)
+        my_model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
+                                  config.decoder_dim, device=device).to(device)
 
         # Make the loss and optimizer
         criterion = nn.CrossEntropyLoss(ignore_index=vocab.stoi["<PAD>"])
@@ -98,6 +98,5 @@ if __name__ == "__main__":
         DATA_LOCATION=DATA_LOCATION,
         train_size = 0.8
     )
-
 
     model = model_pipeline(config)

@@ -42,10 +42,12 @@ def flickr_train_test_split(dataset, train_size):
 
     return train_dataset, test_dataset
 
+
 def make_dataset(config):
     dataset = joblib.load(config.DATA_LOCATION + "/processed_dataset.joblib")
     dataset.spacy_eng = spacy.load("en_core_web_sm")
     return dataset
+
 
 # Make initializations
 def make_dataloaders(config, dataset):
@@ -55,14 +57,6 @@ def make_dataloaders(config, dataset):
     test_loader = get_data_loader(test_dataset, batch_size=config.test_batch_size)
 
     return train_loader, test_loader
-
-
-def make_model(config, device='cuda'):
-    # make the model
-    model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
-                           config.decoder_dim, device=device).to(device)
-
-    return model
 
 
 class Vocabulary:
@@ -76,6 +70,7 @@ class Vocabulary:
 
         self.freq_threshold = freq_threshold
         self.spacy_eng = spacy.load("en_core_web_sm")
+
     def __len__(self):
         return len(self.itos)
 
@@ -119,7 +114,6 @@ class FlickrDataset(Dataset):
         self.root_dir = root_dir
         self.df = pd.read_csv(captions_file)
         self.transform = transform
-
 
         # Get image and caption column from the dataframe
         self.imgs = self.df["image"]
@@ -236,23 +230,3 @@ def generate_and_dump_dataset(root_dir, captions_file, transforms, DATA_LOCATION
     )
 
     joblib.dump(dataset, DATA_LOCATION+"/processed_dataset.joblib")
-
-
-def load_ED_model(model_path):
-    # Call: model = load_ED_model('attention_model_state.pth')
-    checkpoint = torch.load(model_path)
-
-    model = EncoderDecoder(
-        embed_size=checkpoint['embed_size'],
-        vocab_size=checkpoint['vocab_size'],
-        attention_dim=checkpoint['attention_dim'],
-        encoder_dim=checkpoint['encoder_dim'],
-        decoder_dim=checkpoint['decoder_dim']
-    )
-    model.load_state_dict(checkpoint['state_dict'])
-
-    return model
-
-
-
-

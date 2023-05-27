@@ -168,3 +168,19 @@ class EncoderDecoder(nn.Module):
         features = self.encoder(images)
         outputs = self.decoder(features, captions)
         return outputs
+
+
+def load_ED_model(model_path):
+    # Call: model = load_ED_model('attention_model_state.pth')
+    checkpoint = torch.load(model_path)
+
+    model = EncoderDecoder(
+        embed_size=checkpoint['embed_size'],
+        vocab_size=checkpoint['vocab_size'],
+        attention_dim=checkpoint['attention_dim'],
+        encoder_dim=checkpoint['encoder_dim'],
+        decoder_dim=checkpoint['decoder_dim']
+    )
+    model.load_state_dict(checkpoint['state_dict'])
+
+    return model
