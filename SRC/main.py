@@ -95,7 +95,7 @@ if __name__ == "__main__":
         learning_rate=3e-4,
         batch_size=256,
         DATA_LOCATION=DATA_LOCATION,
-        train_size = 0.01,
-        test_size = 0.01)
+        train_size = 0.007,
+        test_size = 0.007)
 
     model = model_pipeline(config)
