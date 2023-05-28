@@ -70,13 +70,20 @@ def model_pipeline(cfg: dict):
         test_loss_arr_batch = []
         acc_arr_batch = []
 
+        train_execution_times = []
+        test_execution_times = []
+
         for epoch in tqdm(range(1, config.epochs + 1)):
             # Training the model
+            t0 = time.time()
             train_loss_arr_aux = train(my_model, train_loader, criterion, optimizer, config, epoch)
+            t1 = time.time()
 
             my_model.eval()
             # Testing
+            t2 = time.time()
             acc_arr_aux, test_loss_arr_aux = test(my_model, test_loader, criterion, vocab, config, device)
+            t3 = time.time()
 
             # Check how model performs
             test_model_performance(my_model, test_loader, device, vocab, epoch, config)
@@ -93,16 +100,19 @@ def model_pipeline(cfg: dict):
             acc_arr_epoch.append(sum(acc_arr_aux) / len(acc_arr_aux))
             acc_arr_batch += acc_arr_aux
 
+            train_execution_times.append(t1-t0)
+            test_execution_times.append(t3-t2)
 
-        epoch_df = pd.DataFrame([train_loss_arr_epoch, test_loss_arr_epoch, acc_arr_epoch],
-                                            columns=['epoch_' + str(i) for i in range(len(train_loss_arr_epoch))],
-                                            index=['train_loss', 'test_loss' ,'test_acc'])
+        epoch_df = pd.DataFrame([train_loss_arr_epoch, test_loss_arr_epoch, acc_arr_epoch, train_execution_times,
+                                 test_execution_times],
+                                columns=['epoch_' + str(i) for i in range(len(train_loss_arr_epoch))],
+                                index=['train_loss', 'test_loss' ,'test_acc', 'train_times','test_times'])
         loss_batch_df = pd.DataFrame([train_loss_arr_batch],
-                                            columns=['batch_' + str(i) for i in range(len(train_loss_arr_batch))],
-                                            index=['train_loss'])
+                                    columns=['batch_' + str(i) for i in range(len(train_loss_arr_batch))],
+                                    index=['train_loss'])
         acc_batch_df = pd.DataFrame([acc_arr_batch, test_loss_arr_batch],
-                                            columns=['batch_' + str(i) for i in range(len(acc_arr_batch))],
-                                            index=['test_acc', 'test_loss'])
+                                    columns=['batch_' + str(i) for i in range(len(acc_arr_batch))],
+                                    index=['test_acc', 'test_loss'])
 
         if config.save:
             epoch_df.to_csv(config.DATA_LOCATION+'/logs'+'/epoch_df.csv')
@@ -136,11 +146,11 @@ if __name__ == "__main__":
         attention_dim=256,
         encoder_dim=2048,
         decoder_dim=512,
-        epochs=2,
+        epochs=25,
         learning_rate=3e-4,
-        batch_size=256,
+        batch_size=int(256/4),
         DATA_LOCATION=DATA_LOCATION,
-        train_size=0.1,
+        train_size=0.01,
         save=True
     )
 
