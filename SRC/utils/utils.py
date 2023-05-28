@@ -239,9 +239,9 @@ def generate_and_dump_dataset(root_dir, captions_file, transforms, data_location
     joblib.dump(dataset, data_location+"/processed_dataset.joblib")
 
 
-def load_ED_model(model_path):
-    # Call: model = load_ED_model('attention_model_state.pth')
-    checkpoint = torch.load(model_path)
+def load_ED_model(model_path, device):
+    # Call: model = load_ED_model('attention_model_state.pth', device)
+    checkpoint = torch.load(model_path, map_location=torch.device(device))
 
     model = EncoderDecoder(
         embed_size=checkpoint['embed_size'],
