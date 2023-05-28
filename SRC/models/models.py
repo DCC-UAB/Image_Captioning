@@ -8,7 +8,7 @@ import torch.nn.functional as F
 class EncoderCNN(nn.Module):
     def __init__(self):
         super(EncoderCNN, self).__init__()
-        resnet = models.resnet50(pretrained=True)
+        resnet = models.resnet152(weights=models.ResNet152_Weights.DEFAULT)
         for param in resnet.parameters():
             param.requires_grad_(False)
 

@@ -21,7 +21,10 @@ def test(model, test_loader, criterion, vocab, config, device="cuda", verbatim=T
             # Calculating accuracy
             images = images[0].detach().clone()
             predicted, _ = get_caps_from(model, images.unsqueeze(0), vocab=vocab, device=device)
-            acc_score = sentence_bleu(captions, predicted)
+
+            caps = [vocab.get_caption(cap.tolist()) for cap in captions]
+
+            acc_score = sentence_bleu(caps, predicted)
 
             # Appending metrics
             acc_arr_batch.append(acc_score)
@@ -30,7 +33,7 @@ def test(model, test_loader, criterion, vocab, config, device="cuda", verbatim=T
             total += 1
 
             # Report metrics every 1th batch
-            if ((total + 1) % 1) == 0 and verbatim:
+            if ((total + 1) % 25) == 0 and verbatim:
                 print("Batch:", total, "\nAcc_score = ", acc_score)
                 print("Loss:", loss.tolist())
 

@@ -79,6 +79,9 @@ class Vocabulary:
     def __len__(self):
         return len(self.itos)
 
+    def get_caption(self, numerized_caption):
+        return [self.itos[x] for x in numerized_caption if x not in [0, 1]] # Not using SOS and PAD
+
     @staticmethod
     def tokenize(text, spacy_eng):
 

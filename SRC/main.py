@@ -146,11 +146,11 @@ if __name__ == "__main__":
         attention_dim=256,
         encoder_dim=2048,
         decoder_dim=512,
-        epochs=2,
+        epochs=25,
         learning_rate=3e-4,
-        batch_size=256,
+        batch_size=int(256/4),
         DATA_LOCATION=DATA_LOCATION,
-        train_size=0.8,
+        train_size=0.01,
         save=True
     )
 
