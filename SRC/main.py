@@ -49,11 +49,20 @@ def model_pipeline(cfg: dict):
         dataset = make_dataset(config)
 
         # make the data_loaders, and optimizer
+        t0 = time.time()
         train_loader, test_loader = make_dataloaders(config, dataset, multiprocessing.cpu_count())
+        t1 = time.time()
+        print("data_loader building time:", t1-t0)
 
         # Generate vocab
         vocab = dataset.vocab
         config.vocab_size = len(vocab)
+
+        t0 = time.time()
+        for i,j in train_loader:
+            pass
+        t1 = time.time()
+        print(t1-t0)
 
         # Get the model
         my_model = make_model(config, device)
@@ -149,9 +158,9 @@ if __name__ == "__main__":
         decoder_dim=512,
         epochs=25,
         learning_rate=3e-4,
-        batch_size=int(256/8),
+        batch_size=32,
         DATA_LOCATION=DATA_LOCATION,
-        train_size=0.01,
+        train_size=0.8,
         save=True
     )
 

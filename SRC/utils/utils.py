@@ -48,11 +48,36 @@ def make_dataset(config):
     return dataset
 
 # Make initializations
+
+def preprocess_data(dataset):
+    # Preprocessing the data instead of doing it in the data_loader
+    data_list = []
+
+    for _, (img_name, caption) in dataset.df.iterrows():
+        img_location = os.path.join(dataset.root_dir, img_name)
+        img = Image.open(img_location)
+        img = img.convert("RGB")
+
+        img = dataset.transform(img)
+
+        caption_vec = []
+        caption_vec += [dataset.vocab.stoi["<SOS>"]]
+        caption_vec += dataset.vocab.numericalize(caption, dataset.spacy_eng)
+        caption_vec += [dataset.vocab.stoi["<EOS>"]]
+
+        data_list.append( [img.to(torch.int16), torch.tensor(caption_vec).to(torch.float16)] )
+
+    return data_list
+
 def make_dataloaders(config, dataset, num_workers):
+
     train_dataset, test_dataset = flickr_train_test_split(dataset, config.train_size)
 
-    train_loader = get_data_loader(train_dataset, batch_size=config.batch_size, num_workers=num_workers)
-    test_loader = get_data_loader(test_dataset, batch_size = 5, num_workers=num_workers)
+    preprocessed_train = preprocess_data(train_dataset)
+    preprocessed_test = preprocess_data(test_dataset)
+
+    train_loader = get_data_loader(preprocessed_train, dataset, batch_size=config.batch_size, num_workers=num_workers, shuffle=True)
+    test_loader = get_data_loader(preprocessed_test, dataset, batch_size = 5, num_workers=num_workers)
 
     return train_loader, test_loader
 
@@ -173,13 +198,13 @@ class CapsCollate:
         return imgs, targets
 
 
-def get_data_loader(dataset, batch_size, shuffle=False, num_workers=1):
+def get_data_loader(dataset, aux_dataset, batch_size, shuffle=False, num_workers=1):
     """
     Returns torch dataloader for the flicker8k dataset
     
     Parameters
     -----------
-    dataset: FlickrDataset
+    dataset: FlickrDataset or List of lists
         custom torchdataset named FlickrDataset 
     batch_size: int
         number of data to load in a particular batch
@@ -189,7 +214,7 @@ def get_data_loader(dataset, batch_size, shuffle=False, num_workers=1):
         numbers of workers to run (default is 1)  
     """
 
-    pad_idx = dataset.vocab.stoi["<PAD>"]
+    pad_idx = aux_dataset.vocab.stoi["<PAD>"]
     collate_fn = CapsCollate(pad_idx=pad_idx, batch_first=True)
 
     data_loader = DataLoader(
