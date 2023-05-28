@@ -150,7 +150,7 @@ if __name__ == "__main__":
         root_dir=DATA_LOCATION+"/Images",
         captions_file=DATA_LOCATION+"/captions.txt",
         device=device,
-        encoder='ResNet152',
+        encoder='ResNet50',
         transforms=transforms,
         embed_size=300,
         attention_dim=256,
