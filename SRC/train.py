@@ -1,31 +1,32 @@
 from tqdm.auto import tqdm
 import wandb
 from utils.utils import *
+from test import *
 
 
-def train(model, data_loader, criterion, optimizer, config, num_epochs=1, save=False): # 25
+def train(model, data_loader, criterion, optimizer, config, epoch, verbatim = True): # 25
     # Tell wandb to watch what the model gets up to: gradients, weights, and more!
     wandb.watch(model, criterion, log="all", log_freq=10)
 
     # Run training and track with wandb
-    total_batches = len(data_loader) * config.epochs
     example_ct = 0  # number of examples seen
     batch_ct = 0
 
-    for epoch in tqdm(range(1, num_epochs + 1)):
-        for idx, (image, captions) in enumerate(iter(data_loader)):
+    loss_arr_batch = []  # Losses of the batches
 
-            loss = train_batch(image, captions, model, config.vocab_size, optimizer, criterion, device=config.device)
-            example_ct += len(image)
-            batch_ct += 1
+    for idx, (image, captions) in enumerate(iter(data_loader)):
 
-            # Report metrics every 1th batch
-            if ((batch_ct + 1) % 1) == 0:
-                train_log(loss, example_ct, epoch)
+        loss = train_batch(image, captions, model, config.vocab_size, optimizer, criterion, device=config.device)
+        example_ct += len(image)
+        batch_ct += 1
 
-    if save:
-        # save the latest model
-        save_model(model, config)
+        loss_arr_batch.append(loss.tolist())
+
+        # Report metrics every 1th batch
+        if ((batch_ct + 1) % 1) == 0 and verbatim:
+            train_log(loss, example_ct, epoch)
+
+    return loss_arr_batch
 
 
 def train_batch(image, captions, model, vocab_size, optimizer, criterion, device='cuda'):
