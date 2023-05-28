@@ -141,7 +141,7 @@ if __name__ == "__main__":
         root_dir=DATA_LOCATION+"/Images",
         captions_file=DATA_LOCATION+"/captions.txt",
         device=device,
-        encoder='ResNet152',
+        encoder='ResNet50',
         transforms=transforms,
         embed_size=300,
         attention_dim=256,
@@ -149,9 +149,9 @@ if __name__ == "__main__":
         decoder_dim=512,
         epochs=25,
         learning_rate=3e-4,
-        batch_size=int(256/8),
+        batch_size=int(256),
         DATA_LOCATION=DATA_LOCATION,
-        train_size=0.01,
+        train_size=0.1,
         save=True
     )
 
