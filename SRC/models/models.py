@@ -6,9 +6,16 @@ import torch.nn.functional as F
 
 # Image Encoder
 class EncoderCNN(nn.Module):
-    def __init__(self):
+    def __init__(self, encoder='ResNet50'):
         super(EncoderCNN, self).__init__()
-        resnet = models.resnet152(weights=models.ResNet152_Weights.DEFAULT)
+
+        if encoder == 'ResNet50':
+            resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
+        elif encoder == 'ResNet152':
+            resnet = models.resnet152(weights=models.ResNet152_Weights.DEFAULT)
+        else:
+            resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
+
         for param in resnet.parameters():
             param.requires_grad_(False)
 
@@ -152,9 +159,11 @@ class DecoderRNN(nn.Module):
 
 # Full model
 class EncoderDecoder(nn.Module):
-    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, drop_prob=0.3, device='cuda'):
+    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, drop_prob=0.3, device='cuda', encoder='ResNet50'):
         super().__init__()
-        self.encoder = EncoderCNN()
+        self.encoder = EncoderCNN(
+            encoder=encoder
+        )
         self.decoder = DecoderRNN(
             embed_size=embed_size,
             vocab_size=vocab_size,

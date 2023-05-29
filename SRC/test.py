@@ -9,12 +9,16 @@ def test(model, test_loader, criterion, vocab, config, device="cuda", verbatim=T
     acc_arr_batch = []
     loss_arr_batch = []
     total = 0
+    total_time = 0
     with torch.no_grad():
         for images, captions in test_loader:
             images, captions = images.to(device), captions.to(device)
 
             # Calculating loss
+            t0 = time.time()
             outputs, attentions = model(images, captions)
+            t1 = time.time()
+            total_time += t1-t0
             targets = captions[:, 1:]
             loss = criterion(outputs.view(-1, config.vocab_size), targets.reshape(-1))
 
@@ -42,5 +46,5 @@ def test(model, test_loader, criterion, vocab, config, device="cuda", verbatim=T
               f"test images: {sum(acc_arr_batch)/len(acc_arr_batch)}%")
         
         wandb.log({"test_mean_bleu": sum(acc_arr_batch)/len(acc_arr_batch)})
-
+        print("count:", total_time)
     return acc_arr_batch, loss_arr_batch
