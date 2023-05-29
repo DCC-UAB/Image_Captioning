@@ -20,6 +20,7 @@ import multiprocessing
 global device
 
 import os
+
 # Setting CUDA ALLOC split size to 256 to avoid running out of memory
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
 # Stopping wandb from creating symlinks
@@ -50,26 +51,21 @@ def model_pipeline(cfg: dict):
 
         # make the data_loaders, and optimizer
         t0 = time.time()
-        train_loader, test_loader = make_dataloaders(config, dataset, multiprocessing.cpu_count())
+        train_loader, test_loader = make_dataloaders(config, dataset, 1)
         t1 = time.time()
-        print("data_loader building time:", t1-t0)
+        print("Preprocessing_time:", t1-t0)
 
         # Generate vocab
         vocab = dataset.vocab
         config.vocab_size = len(vocab)
 
-        t0 = time.time()
-        for i,j in train_loader:
-            pass
-        t1 = time.time()
-        print(t1-t0)
 
         # Get the model
         my_model = make_model(config, device)
 
         # Make the loss and optimizer
         criterion = nn.CrossEntropyLoss(ignore_index=vocab.stoi["<PAD>"])
-        optimizer = torch.optim.Adam(my_model.parameters(), lr=config.learning_rate)
+        optimizer = torch.optim.SGD(my_model.parameters(), lr=config.learning_rate, momentum=config.momentum)
 
         train_loss_arr_epoch = []  # Mean of the losses of the last epoch
         test_loss_arr_epoch = []
@@ -156,12 +152,13 @@ if __name__ == "__main__":
         attention_dim=256,
         encoder_dim=2048,
         decoder_dim=512,
-        epochs=25,
-        learning_rate=3e-4,
-        batch_size=32,
+        epochs=20,
+        learning_rate=0.01,
+        batch_size=50,
         DATA_LOCATION=DATA_LOCATION,
         train_size=0.8,
-        save=True
+        save=True,
+        momentum=0.8
     )
 
     model = model_pipeline(config)

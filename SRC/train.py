@@ -16,7 +16,7 @@ def train(model, data_loader, criterion, optimizer, config, epoch, verbatim = Tr
 
     for idx, (image, captions) in enumerate(iter(data_loader)):
 
-        loss = train_batch(image, captions, model, config.vocab_size, optimizer, criterion, device=config.device)
+        loss = train_batch(image.to(torch.float32), captions, model, config.vocab_size, optimizer, criterion, device=config.device)
         example_ct += len(image)
         batch_ct += 1
 
