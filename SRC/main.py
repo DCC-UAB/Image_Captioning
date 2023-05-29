@@ -50,7 +50,7 @@ def model_pipeline(cfg: dict):
 
         # make the data_loaders, and optimizer
         t0 = time.time()
-        train_loader, test_loader = make_dataloaders(config, dataset, multiprocessing.cpu_count())
+        train_loader, test_loader = make_dataloaders(config, dataset, 1)
         t1 = time.time()
         print("data_loader building time:", t1-t0)
 
@@ -162,7 +162,7 @@ if __name__ == "__main__":
         learning_rate=3e-4,
         batch_size=32,
         DATA_LOCATION=DATA_LOCATION,
-        train_size=0.8,
+        train_size=0.05,
         save=True
     )
 
