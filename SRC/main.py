@@ -146,11 +146,13 @@ if __name__ == "__main__":
 
     DATA_LOCATION = '../data'
 
+    # new file
+
     config = dict(
         root_dir=DATA_LOCATION+"/Images",
         captions_file=DATA_LOCATION+"/captions.txt",
         device=device,
-        encoder='ResNet50',
+        encoder='ResNet152',
         transforms=transforms,
         embed_size=300,
         attention_dim=256,
