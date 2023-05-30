@@ -5,6 +5,7 @@ from test import *
 
 
 def train(model, data_loader, criterion, optimizer, config, epoch, verbatim = True): # 25
+    t0 = time.time()
     # Tell wandb to watch what the model gets up to: gradients, weights, and more!
     wandb.watch(model, criterion, log="all", log_freq=10)
 
@@ -26,7 +27,7 @@ def train(model, data_loader, criterion, optimizer, config, epoch, verbatim = Tr
         if ((batch_ct + 1) % 1) == 0 and verbatim:
             train_log(loss, example_ct, epoch)
 
-    return loss_arr_batch
+    return loss_arr_batch, time.time()-t0
 
 
 def train_batch(image, captions, model, vocab_size, optimizer, criterion, device='cuda'):

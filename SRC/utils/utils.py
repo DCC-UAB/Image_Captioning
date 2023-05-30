@@ -13,6 +13,40 @@ from sklearn.model_selection import train_test_split
 from models.models import *
 import time
 
+def get_criterion(name, ignoring_index):
+    if name == 'CrossEntropy':
+        return nn.CrossEntropyLoss(ignore_index=ignoring_index)
+    else:
+        return nn.CrossEntropyLoss(ignore_index=ignoring_index)
+    
+    
+def get_optimizer(name, params, lr):
+    if name == 'Adam':
+        return torch.optim.Adam(params=params, lr = lr)
+    else:
+        return torch.optim.Adam(params=params, lr = lr)
+
+    
+def export_data(train_loss_arr_epoch, test_loss_arr_epoch, acc_arr_epoch, train_execution_times, test_execution_times,
+                   train_loss_arr_batch, acc_arr_batch, test_loss_arr_batch, config):
+    
+    epoch_df = pd.DataFrame([train_loss_arr_epoch, test_loss_arr_epoch, acc_arr_epoch, train_execution_times,
+                                 test_execution_times],
+                            columns=['epoch_' + str(i) for i in range(len(train_loss_arr_epoch))],
+                            index=['train_loss', 'test_loss' ,'test_acc', 'train_times','test_times'])
+    
+    loss_batch_df = pd.DataFrame([train_loss_arr_batch],
+                                 columns=['batch_' + str(i) for i in range(len(train_loss_arr_batch))],
+                                 index=['train_loss'])
+    
+    acc_batch_df = pd.DataFrame([acc_arr_batch, test_loss_arr_batch],
+                                columns=['batch_' + str(i) for i in range(len(acc_arr_batch))],
+                                index=['test_acc', 'test_loss'])
+    
+    epoch_df.to_csv(config.DATA_LOCATION+'/logs'+'/epoch_df.csv')
+    loss_batch_df.to_csv(config.DATA_LOCATION+'/logs'+'/loss_batch_df.csv')
+    acc_batch_df.to_csv(config.DATA_LOCATION+'/logs'+'/acc_batch_df.csv')
+
 
 def flickr_train_test_split(dataset, train_size):
     # Finding idx of the data to train making sure no img is in train and test at the same time
@@ -24,7 +58,7 @@ def flickr_train_test_split(dataset, train_size):
     # Splitting dataset
     dataset.df = dataset.df.sort_values(by='image').reset_index(drop=True) # Grouping each img in 5 rows
     train_X = dataset.df.iloc[:to_train]
-    test_X = dataset.df.iloc[to_train:]
+    test_X = dataset.df.iloc[to_train:to_train+100]
 
     # Creating the datasets
     train_dataset = deepcopy(dataset)
