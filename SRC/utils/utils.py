@@ -132,14 +132,6 @@ def make_dataloaders(config, dataset, num_workers):
     return train_loader, test_loader
 
 
-def make_model(config, device='cuda'):
-    # make the model
-    model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
-                           config.decoder_dim, device=device, encoder=config.encoder).to(device)
-
-    return model
-
-
 class Vocabulary:
     def __init__(self, freq_threshold):
         # setting the pre-reserved tokens int to string tokens
@@ -312,22 +304,6 @@ def generate_and_dump_dataset(root_dir, captions_file, transforms, data_location
     )
 
     joblib.dump(dataset, data_location+"/processed_dataset.joblib")
-
-
-def load_ED_model(model_path, device):
-    # Call: model = load_ED_model('attention_model_state.pth', device)
-    checkpoint = torch.load(model_path, map_location=torch.device(device))
-
-    model = EncoderDecoder(
-        embed_size=checkpoint['embed_size'],
-        vocab_size=checkpoint['vocab_size'],
-        attention_dim=checkpoint['attention_dim'],
-        encoder_dim=checkpoint['encoder_dim'],
-        decoder_dim=checkpoint['decoder_dim']
-    )
-    model.load_state_dict(checkpoint['state_dict'])
-
-    return model
 
 
 def test_model_performance(model, test_loader, device, vocab, epoch, config):
