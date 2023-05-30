@@ -177,3 +177,27 @@ class EncoderDecoder(nn.Module):
         features = self.encoder(images)
         outputs = self.decoder(features, captions)
         return outputs
+
+
+def make_model(config, device='cuda'):
+    # make the model
+    model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
+                           config.decoder_dim, device=device, encoder=config.encoder).to(device)
+
+    return model
+
+
+def load_ED_model(model_path):
+    # Call: model = load_ED_model('attention_model_state.pth')
+    checkpoint = torch.load(model_path)
+
+    model = EncoderDecoder(
+        embed_size=checkpoint['embed_size'],
+        vocab_size=checkpoint['vocab_size'],
+        attention_dim=checkpoint['attention_dim'],
+        encoder_dim=checkpoint['encoder_dim'],
+        decoder_dim=checkpoint['decoder_dim']
+    )
+    model.load_state_dict(checkpoint['state_dict'])
+
+    return model

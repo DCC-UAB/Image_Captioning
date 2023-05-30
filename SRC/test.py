@@ -12,7 +12,7 @@ def test(model, test_loader, criterion, vocab, config, device="cuda", verbatim=T
     total_time = 0
     with torch.no_grad():
         for images, captions in test_loader:
-            images, captions = images.to(device), captions.to(device)
+            images, captions = images.to(device).to(torch.float32), captions.to(device)
 
             # Calculating loss
             t0 = time.time()
