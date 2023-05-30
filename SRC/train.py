@@ -41,6 +41,7 @@ def train_batch(image, captions, model, vocab_size, optimizer, criterion, device
 
     # Calculate the batch loss.
     targets = captions[:, 1:]
+
     loss = criterion(outputs.view(-1, vocab_size), targets.reshape(-1))
 
     # Backward pass.

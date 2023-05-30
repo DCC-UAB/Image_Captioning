@@ -65,7 +65,7 @@ def model_pipeline(cfg: dict):
 
         # Make the loss and optimizer
         criterion = nn.CrossEntropyLoss(ignore_index=vocab.stoi["<PAD>"])
-        optimizer = torch.optim.SGD(my_model.parameters(), lr=config.learning_rate, momentum=config.momentum)
+        optimizer = torch.optim.Adam(my_model.parameters(), lr=config.learning_rate)
 
         train_loss_arr_epoch = []  # Mean of the losses of the last epoch
         test_loss_arr_epoch = []
@@ -153,7 +153,7 @@ if __name__ == "__main__":
         encoder_dim=2048,
         decoder_dim=512,
         epochs=20,
-        learning_rate=0.01,
+        learning_rate=3e-4,
         batch_size=50,
         DATA_LOCATION=DATA_LOCATION,
         train_size=0.8,

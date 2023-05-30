@@ -24,7 +24,7 @@ def flickr_train_test_split(dataset, train_size):
     # Splitting dataset
     dataset.df = dataset.df.sort_values(by='image').reset_index(drop=True) # Grouping each img in 5 rows
     train_X = dataset.df.iloc[:to_train]
-    test_X = dataset.df.iloc[to_train:]
+    test_X = dataset.df.iloc[to_train:to_train+1000]
 
     # Creating the datasets
     train_dataset = deepcopy(dataset)
@@ -56,8 +56,8 @@ class ImgGroupingDataset:
         return len(self.data)*5 # self.data has exactly num_imgs*captions_per_image = num_imgs*5
 
     def __getitem__(self, index): # Recives the index out of 40.000
-        # Schema: [[img1,[cap1, cap2, cap3, cap4, cap5], [...], ...]]
-        img = self.data[index//5][0].clone()
+        # Schema: [[img1,[cap1, cap2, cap3, cap4, cap5]], [...], ...]]
+        img = self.data[index//5][0]
         captions = self.data[index//5][1][index%5]
         return img, captions   # No preprocessing here
 
@@ -79,6 +79,7 @@ def preprocess_dataset(dataset):
             img = dataset.transform(img)
 
             data_list.append([img.to(torch.float16), current_img_captions])
+            current_img_captions = []
 
     return data_list
 
@@ -192,7 +193,7 @@ class FlickrDataset(Dataset):
         caption_vec += self.vocab.numericalize(caption, self.spacy_eng)
         caption_vec += [self.vocab.stoi["<EOS>"]]
 
-        return img, torch.tensor(caption_vec)
+        return img.clone(), torch.tensor(caption_vec)
 
 
 class CapsCollate:
