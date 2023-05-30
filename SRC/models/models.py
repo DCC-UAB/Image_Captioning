@@ -179,6 +179,14 @@ class EncoderDecoder(nn.Module):
         return outputs
 
 
+def make_model(config, device='cuda'):
+    # make the model
+    model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
+                           config.decoder_dim, device=device, encoder=config.encoder).to(device)
+
+    return model
+
+
 def load_ED_model(model_path):
     # Call: model = load_ED_model('attention_model_state.pth')
     checkpoint = torch.load(model_path)
