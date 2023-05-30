@@ -10,7 +10,7 @@ from PIL import Image
 import joblib
 from copy import deepcopy
 from sklearn.model_selection import train_test_split
-from SRC.models.models import *
+from models.models import *
 import time
 
 
@@ -22,7 +22,7 @@ def flickr_train_test_split(dataset, train_size):
         to_train += 1
 
     # Splitting dataset
-    dataset.df = dataset.df.sort_values(by='image') # Grouping each img in 5 rows
+    dataset.df = dataset.df.sort_values(by='image').reset_index(drop=True) # Grouping each img in 5 rows
     train_X = dataset.df.iloc[:to_train]
     test_X = dataset.df.iloc[to_train:]
 
@@ -47,25 +47,39 @@ def make_dataset(config):
     dataset.spacy_eng = spacy.load("en_core_web_sm")
     return dataset
 
-# Make initializations
 
-def preprocess_data(dataset):
-    # Preprocessing the data instead of doing it in the data_loader
+class ImgGroupingDataset:
+    def __init__(self, data):
+        self.data = data
+
+    def __len__(self):
+        return len(self.data)*5 # self.data has exactly num_imgs*captions_per_image = num_imgs*5
+
+    def __getitem__(self, index): # Recives the index out of 40.000
+        # Schema: [[img1,[cap1, cap2, cap3, cap4, cap5]], [...], ...]]
+        img = self.data[index//5][0]
+        captions = self.data[index//5][1][index%5]
+        return img, captions   # No preprocessing here
+
+def preprocess_dataset(dataset):
     data_list = []
-
-    for _, (img_name, caption) in dataset.df.iterrows():
-        img_location = os.path.join(dataset.root_dir, img_name)
-        img = Image.open(img_location)
-        img = img.convert("RGB")
-
-        img = dataset.transform(img)
-
+    current_img_captions = []
+    for idx, (img_name, caption) in dataset.df.reset_index(drop=True).iterrows():
         caption_vec = []
         caption_vec += [dataset.vocab.stoi["<SOS>"]]
         caption_vec += dataset.vocab.numericalize(caption, dataset.spacy_eng)
         caption_vec += [dataset.vocab.stoi["<EOS>"]]
 
-        data_list.append( [img.to(torch.int16), torch.tensor(caption_vec).to(torch.float16)] )
+        current_img_captions.append(torch.tensor(caption_vec))
+        if not ((idx + 1) % 5):  # One time each 5 iterations the image will be processed
+            img_location = os.path.join(dataset.root_dir, img_name)
+            img = Image.open(img_location)
+            img = img.convert("RGB")
+
+            img = dataset.transform(img)
+
+            data_list.append([img.to(torch.float16), current_img_captions])
+            current_img_captions = []
 
     return data_list
 
@@ -73,11 +87,13 @@ def make_dataloaders(config, dataset, num_workers):
 
     train_dataset, test_dataset = flickr_train_test_split(dataset, config.train_size)
 
-    preprocessed_train = preprocess_data(train_dataset)
-    preprocessed_test = preprocess_data(test_dataset)
+    processed_train = ImgGroupingDataset(preprocess_dataset(train_dataset))
+    processed_test = ImgGroupingDataset(preprocess_dataset(test_dataset))
 
-    train_loader = get_data_loader(preprocessed_train, dataset, batch_size=config.batch_size, num_workers=num_workers, shuffle=True)
-    test_loader = get_data_loader(preprocessed_test, dataset, batch_size = 5, num_workers=num_workers)
+    train_loader = get_data_loader(processed_train, dataset, batch_size=config.batch_size,
+                                   num_workers=num_workers, shuffle=True)
+    test_loader = get_data_loader(processed_test, dataset, batch_size = 5,
+                                  num_workers=num_workers, shuffle=False)
 
     return train_loader, test_loader
 
@@ -177,7 +193,7 @@ class FlickrDataset(Dataset):
         caption_vec += self.vocab.numericalize(caption, self.spacy_eng)
         caption_vec += [self.vocab.stoi["<EOS>"]]
 
-        return img, torch.tensor(caption_vec)
+        return img.clone(), torch.tensor(caption_vec)
 
 
 class CapsCollate:
@@ -198,7 +214,7 @@ class CapsCollate:
         return imgs, targets
 
 
-def get_data_loader(dataset, aux_dataset, batch_size, shuffle=False, num_workers=1):
+def get_data_loader(dataset, dataset_aux, batch_size, shuffle=False, num_workers=1):
     """
     Returns torch dataloader for the flicker8k dataset
     
@@ -214,7 +230,7 @@ def get_data_loader(dataset, aux_dataset, batch_size, shuffle=False, num_workers
         numbers of workers to run (default is 1)  
     """
 
-    pad_idx = aux_dataset.vocab.stoi["<PAD>"]
+    pad_idx = dataset_aux.vocab.stoi["<PAD>"]
     collate_fn = CapsCollate(pad_idx=pad_idx, batch_first=True)
 
     data_loader = DataLoader(
@@ -284,6 +300,7 @@ def test_model_performance(model, test_loader, device, vocab, epoch, config):
     with torch.no_grad():
         dataiter = iter(deepcopy(test_loader))
         img, real_captions = next(dataiter)
+        img = img.to(torch.float32)
         features = model.encoder(img[0:1].to(device))
         caps, alphas = model.decoder.generate_caption(features, vocab=vocab)
         caption = ' '.join(caps)
