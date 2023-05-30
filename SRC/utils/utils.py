@@ -24,7 +24,7 @@ def flickr_train_test_split(dataset, train_size):
     # Splitting dataset
     dataset.df = dataset.df.sort_values(by='image').reset_index(drop=True) # Grouping each img in 5 rows
     train_X = dataset.df.iloc[:to_train]
-    test_X = dataset.df.iloc[to_train:to_train+1000]
+    test_X = dataset.df.iloc[to_train:]
 
     # Creating the datasets
     train_dataset = deepcopy(dataset)
