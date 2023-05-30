@@ -1,4 +1,8 @@
 import matplotlib.pyplot as plt
+import torch
+import torchaudio
+import IPython
+
 
 # show the tensor image
 def show_image(img, title=None):
@@ -45,3 +49,19 @@ def plot_attention(img, result, attention_plot):
 
     plt.tight_layout()
     plt.show()
+
+
+def text_to_speech(text, device='cuda'):
+    bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH
+    processor = bundle.get_text_processor()
+    tacotron2 = bundle.get_tacotron2().to(device)
+    vocoder = bundle.get_vocoder().to(device)
+
+    with torch.inference_mode():
+        processed, lengths = processor(text)
+        processed = processed.to(device)
+        lengths = lengths.to(device)
+        spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
+        waveforms, lengths = vocoder(spec, spec_lengths)
+
+    IPython.display.Audio(waveforms[0:1].cpu(), rate=vocoder.sample_rate)
