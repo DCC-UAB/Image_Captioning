@@ -286,5 +286,3 @@ def test_model_performance(model, test_loader, device, vocab, epoch, config):
         joblib.dump(caption, config.DATA_LOCATION+'/logs'+'/caption_epoch_' + str(epoch) + '.joblib')
         joblib.dump(caps, config.DATA_LOCATION + '/logs' + '/caps_epoch_' + str(epoch) + '.joblib')
         joblib.dump(alphas, config.DATA_LOCATION+ '/logs' + '/aphas_epoch_' + str(epoch) + '.joblib')
-
-

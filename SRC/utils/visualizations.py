@@ -64,4 +64,4 @@ def text_to_speech(text, device='cuda'):
         spec, spec_lengths, _ = tacotron2.infer(processed, lengths)
         waveforms, lengths = vocoder(spec, spec_lengths)
 
-    IPython.display.Audio(waveforms[0:1].cpu(), rate=vocoder.sample_rate)
+    return IPython.display.Audio(waveforms[0:1].cpu(), rate=vocoder.sample_rate)
