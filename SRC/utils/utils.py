@@ -16,14 +16,20 @@ import time
 def get_criterion(name, ignoring_index):
     if name == 'CrossEntropy':
         return nn.CrossEntropyLoss(ignore_index=ignoring_index)
+    elif name == 'MSE':
+        return torch.nn.MSELoss(ignore_index=ignoring_index)
     else:
+        print("WRONG CRITERION")
         return nn.CrossEntropyLoss(ignore_index=ignoring_index)
     
     
 def get_optimizer(name, params, lr):
     if name == 'Adam':
         return torch.optim.Adam(params=params, lr = lr)
+    elif name == 'Adagrad':
+        return torch.optim.Adagrad(params=params, lr = lr)
     else:
+        print("WRONG Optimizer")
         return torch.optim.Adam(params=params, lr = lr)
 
     
@@ -58,7 +64,7 @@ def flickr_train_test_split(dataset, train_size):
     # Splitting dataset
     dataset.df = dataset.df.sort_values(by='image').reset_index(drop=True) # Grouping each img in 5 rows
     train_X = dataset.df.iloc[:to_train]
-    test_X = dataset.df.iloc[to_train:to_train+100]
+    test_X = dataset.df.iloc[to_train:]
 
     # Creating the datasets
     train_dataset = deepcopy(dataset)
