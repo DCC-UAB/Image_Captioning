@@ -13,6 +13,10 @@ class EncoderCNN(nn.Module):
             resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
         elif encoder == 'ResNet152':
             resnet = models.resnet152(weights=models.ResNet152_Weights.DEFAULT)
+        elif encoder == 'googleNet':
+            resnet = models.googlenet(pretrained=True)
+        elif encoder == 'VGG':
+            resnet = models.vgg19(weights=models.VGG19_Weights.DEFAULT)
         else:
             resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
 
@@ -155,7 +159,7 @@ class DecoderRNN(nn.Module):
         h = self.init_h(mean_encoder_out)  # (batch_size, decoder_dim)
         c = self.init_c(mean_encoder_out)
         return h, c
-
+    
 
 # Full model
 class EncoderDecoder(nn.Module):
