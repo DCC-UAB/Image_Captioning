@@ -156,14 +156,14 @@ if __name__ == "__main__":
         # Training data
         epochs=1,
         batch_size=50,
-        train_size=0.1,
+        train_size=0.8,
         
         # Model data
         optimizer='Adam',
         criterion='CrossEntropy',
         learning_rate=0.0001,
         device=device,
-        encoder='ResNet50',
+        encoder='ResNet152',
         transforms=transforms,
         embed_size=300,
         attention_dim=256,

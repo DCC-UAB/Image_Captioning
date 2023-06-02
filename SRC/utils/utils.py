@@ -238,7 +238,7 @@ def preprocess_dataset(dataset):
 
 
 def make_dataloaders(config, dataset, num_workers):
-	"""
+    """
     Main function to get the data loaders from the dataset. Splits de dataset, preprocesses it and creates the data loaders.
     
     Parameters:
@@ -466,7 +466,7 @@ def save_model(model, config, model_path):
 
 
 def get_caps_from(model, features_tensors, vocab, device='cuda'):
-	"""
+    """
     Generates the caption using the model and the encoded-decoded image.
     
     Parameters:
@@ -498,7 +498,7 @@ def get_caps_from(model, features_tensors, vocab, device='cuda'):
 def generate_and_dump_dataset(root_dir, captions_file, transforms, data_location):
     """
     Creates the FlickrDataset and saves it into the indicated path.
-    
+
     Parameters:
     ------------
     	root_dir: Str.
