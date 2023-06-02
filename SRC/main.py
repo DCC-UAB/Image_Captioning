@@ -137,9 +137,17 @@ if __name__ == "__main__":
 
     print("Using: ", device)
 
+    # Resized and then crops (maintains perspective)
     transforms = T.Compose([
         T.Resize(226),
         T.RandomCrop(224),
+        T.ToTensor(),
+        T.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+    ])
+
+    # Directly resized (doesn't maintain perspective)
+    transforms_2 = T.Compose([
+        T.Resize((224,224)),
         T.ToTensor(),
         T.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     ])
@@ -154,17 +162,17 @@ if __name__ == "__main__":
         save=True,
 
         # Training data
-        epochs=1,
+        epochs=10,
         batch_size=50,
         train_size=0.8,
         
         # Model data
         optimizer='Adam',
         criterion='CrossEntropy',
-        learning_rate=0.0001,
+        learning_rate=0.0003,
         device=device,
         encoder='ResNet152',
-        transforms=transforms,
+        transforms=transforms_2,
         embed_size=300,
         attention_dim=256,
         encoder_dim=2048,
