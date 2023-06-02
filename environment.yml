@@ -1,29 +1,27 @@
-name: xnap-projecte
+name: xnap-example
 channels:
-- pytorch
-- defaults
+  - pytorch
+  - defaults
 dependencies:
-- python=3.8
-- pytorch
-- numpy
-- tqdm
-- pandas
-- tensorboard
-- protobuf<=3.20
-- pip
-- pip:
-  - torchvision
-  - onnx
-  - wandb
-  - onnxruntime
-  - ipykernel
-  - spacy
-  - joblib
-  - pandas
-  - scikit-learn
   - collections
-  - Pillow
-  - copy
-  - os
-  - matplotlib
-  - nltk
+  - numpy
+  - tqdm
+  - pytorch
+  - tensorboard
+  - python=3.8
+  - pip
+  - protobuf[version='<=3.20']
+  - pip:
+    - ipykernel
+    - ipython
+    - joblib
+    - matplotlib
+    - nltk
+    - onnx
+    - pandas
+    - pillow
+    - scikit-learn
+    - spacy
+    - torchaudio
+    - torchvision
+    - wandb
