@@ -64,7 +64,7 @@ def train(model, data_loader, criterion, optimizer, config, epoch=-1, verbatim =
 
 
 def train_batch(image, captions, model, vocab_size, optimizer, criterion, device='cuda:0'):
-	"""
+    """
     Trains the model for on one single batch and returns the loss.
     """
     image, captions = image.to(device), captions.to(device)

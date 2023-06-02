@@ -147,7 +147,7 @@ if __name__ == "__main__":
 
     # Directly resized (doesn't maintain perspective)
     transforms_2 = T.Compose([
-        T.Resize((224,224)),
+        T.Resize((224, 224)),
         T.ToTensor(),
         T.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     ])
@@ -177,6 +177,7 @@ if __name__ == "__main__":
         attention_dim=256,
         encoder_dim=2048,
         decoder_dim=512,
+        momentum=0.8
     )
 
     model = model_pipeline(config)
