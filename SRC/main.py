@@ -1,30 +1,29 @@
+# Performance and visualization
 import os
-import random
 import wandb
+import multiprocessing
 
+# Data manipulation packages
 import numpy as np
 import torch
 import torch.nn as nn
 import torchvision
 import torchvision.transforms as T
+import random
 
+# Own packages
 from train import *
 from test import *
 from utils.utils import *
 from models.models import *
-import multiprocessing
-
 
 
 # Global variables
 global device
 
-import os
-
-# Setting CUDA ALLOC split size to 256 to avoid running out of memory
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
-# Stopping wandb from creating symlinks
-os.environ["WANDB_DISABLE_SYMLINKS"] = "true"
+# Environment variables (different for each computer)
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128" # Setting CUDA ALLOC split size to 256 to avoid running out of memory
+os.environ["WANDB_DISABLE_SYMLINKS"] = "true" # Stopping wandb from creating symlinks
 
 # Ensure deterministic behavior
 torch.backends.cudnn.deterministic = True
@@ -38,10 +37,44 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def model_pipeline(cfg: dict):
-    # tell wandb to get started
-    with wandb.init(project="pytorch-demo", config=cfg):
-        # access all HPs through wandb.config, so logging matches execution!
-        config = wandb.config
+    """
+    Main loop containing the train-test tasks. All parameter information is included on the config dictionary.
+    
+    Parameters
+    -----------
+    cfg: dictionary.
+    	Contains all the specific parameters to execute the pipeline in string format.
+        # Paths
+        root_dir: Directory where the images are stored.
+        captions_file: Directory where the captions are stored.
+        DATA_LOCATION: Father directory of the images and captions. Where all the data will be storage.
+        save: Boolean, if True then execution logs will be storaged.
+
+        # Training data
+        epochs: Number of epoch.
+        batch_size: Batch size to split the data.
+        train_size: Train size (in percentage).
+        
+        # Model data
+        optimizer: Name of the optimizer. 'Adam', 'Adagrad', 'SGD'.
+        criterion: Name of the criterion used. 'CrossEntropy', 'MSE'
+        learning_rate: Learning rate used for the optimizer.
+        momentum: Momentum used for the optimizer if required.
+        device: Device used. 'CPU' or 'cuda:0'.
+        encoder: Pre-trained net used for encoding the data. 'ResNet50', 'ResNet152', 'googleNet', 'VGG'.
+        transforms: Transforms applied to the images.
+        embed_size: Embedding size. Recomended: 300
+        attention_dim: Dimension for the attention. Recomended: 256.
+        encoder_dim: Dimension for the encoder. Depends of the encoder chosen. Recomended: 2048 (ResNet). 512 (VGG). 1024 (GoogleNet)
+        decoder_dim: Dimension for the decoder. Recomended: 512.
+        
+    Returns
+    ---------
+    Trained Model.
+    """
+    
+    with wandb.init(project="pytorch-demo", config=cfg): # Starting wandb
+        config = wandb.config # access all HPs through wandb.config, so logging matches execution!
 
         # Execute only once to create the dataset
         # generate_and_dump_dataset(config.root_dir, config.captions_file, config.transforms, cfg.DATA_LOCATION)
@@ -52,7 +85,7 @@ def model_pipeline(cfg: dict):
         # Get the data loaders
         train_loader, test_loader = make_dataloaders(config, dataset, 1)
 
-        # Generate vocab
+        # Extract vocab
         vocab = dataset.vocab
         config.vocab_size = len(vocab)
 
@@ -63,14 +96,14 @@ def model_pipeline(cfg: dict):
         criterion = get_criterion(config.criterion, vocab.stoi["<PAD>"])
         criterion.ignore_index=vocab.stoi["<PAD>"]
         
-        optimizer = get_optimizer(config.optimizer, my_model.parameters(), config.learning_rate)
+        optimizer = get_optimizer(config.optimizer, my_model.parameters(), config.learning_rate, config.momentum)
         
         # Arrays to log data
         train_loss_arr_epoch, test_loss_arr_epoch, acc_arr_epoch  = [], [], [] # Epoch-wise
         train_loss_arr_batch, test_loss_arr_batch, acc_arr_batch = [], [], [] # Batch-wise
         train_execution_times, test_execution_times = [], [] # Execution times
 
-        
+        # Main loop
         for epoch in tqdm(range(1, config.epochs + 1)):
             # Training
             my_model.train()
@@ -89,7 +122,7 @@ def model_pipeline(cfg: dict):
             acc_arr_epoch.append(np.mean(acc_arr_aux)); acc_arr_batch += acc_arr_aux
             train_execution_times.append(train_time); test_execution_times.append(test_time)
 
-            
+        # Saving the logs
         if config.save:
             export_data(train_loss_arr_epoch, test_loss_arr_epoch, acc_arr_epoch, train_execution_times, test_execution_times,
                    train_loss_arr_batch, acc_arr_batch, test_loss_arr_batch, config)

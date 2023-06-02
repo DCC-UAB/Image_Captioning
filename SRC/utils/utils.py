@@ -13,7 +13,20 @@ from sklearn.model_selection import train_test_split
 from models.models import *
 import time
 
+
 def get_criterion(name, ignoring_index):
+    """
+    Sets up the criterion used for training the model.
+    
+    Params:
+    --------
+    name: Name of the criterion. 'CrossEntropy', 'MSE'.
+    ignoring_index: Indexes to be ignored when calculating the criterion.
+    
+    Returns:
+    --------
+    Criterion.
+    """
     if name == 'CrossEntropy':
         return nn.CrossEntropyLoss(ignore_index=ignoring_index)
     elif name == 'MSE':
@@ -23,11 +36,26 @@ def get_criterion(name, ignoring_index):
         return nn.CrossEntropyLoss(ignore_index=ignoring_index)
     
     
-def get_optimizer(name, params, lr):
+def get_optimizer(name, params, lr, momentum=None):
+    """
+    Sets up the optimizer used for training the model.
+    
+    Params:
+    --------
+    name: Name of the optimizer. 'Adam', 'Adagrad', 'SGD'.
+    lr: Learning rate of the optimizer.
+    momentum: Momentum of the optimizer if required.
+    
+    Returns:
+    --------
+    Optimizer.
+    """
     if name == 'Adam':
         return torch.optim.Adam(params=params, lr = lr)
     elif name == 'Adagrad':
         return torch.optim.Adagrad(params=params, lr = lr)
+    elif name == 'SGD':
+        return torch.optim.SGD(params=params, lr = lr, momentum = momentum)
     else:
         print("WRONG Optimizer")
         return torch.optim.Adam(params=params, lr = lr)
@@ -35,6 +63,41 @@ def get_optimizer(name, params, lr):
     
 def export_data(train_loss_arr_epoch, test_loss_arr_epoch, acc_arr_epoch, train_execution_times, test_execution_times,
                    train_loss_arr_batch, acc_arr_batch, test_loss_arr_batch, config):
+    """
+    Exports the data logs into a folder named "logs" inside the data location indicated. It separates the logs into three files:
+    - epoch_df: Train loss, test loss, test accuracy, train execution times and test execution times for each epoch.
+    - loss_batch_df: Train loss for each batch.
+    - acc_batch_df: Accuracy and loss from each test batch.
+    
+    Params:
+    --------
+    train_loss_arr_epoch: float Array.
+    	Array with the train losses for each epoch.
+        
+    test_loss_arr_epoch: float Array.
+    	Array with the test losses for each epoch.
+        
+    acc_arr_epoch: float Array.
+    	Array with the test accuracies for each epoch.
+        
+    train_execution_times: float Array.
+    	Array with the execution times for the train each epoch.
+        
+    test_execution_times: float Array.
+    	Array with the execution times for the test each epoch.
+        
+    train_loss_arr_batch: float Array.
+    	Array with the train losses for the train each batch.
+        
+    test_loss_arr_batch: float Array.
+    	Array with the train losses for the test each batch.
+        
+    acc_arr_batch: float Array.
+    	Array with the test accuracies for each batch.
+        
+	config: Dictionary.
+    	Contains hyperparameter information. Needs to contain a "DATA_LOCATION" key with the data location.
+    """
     
     epoch_df = pd.DataFrame([train_loss_arr_epoch, test_loss_arr_epoch, acc_arr_epoch, train_execution_times,
                                  test_execution_times],
@@ -55,6 +118,26 @@ def export_data(train_loss_arr_epoch, test_loss_arr_epoch, acc_arr_epoch, train_
 
 
 def flickr_train_test_split(dataset, train_size):
+    """
+    Performs a train-test split on the the flickr dataset. Assumes that test_size = 1-train_size.
+    Makes sure to avoid biassing the model splitting the dataset in such a way that there is no image in the train and
+    test data at the same time.
+    
+    Parameters:
+    ------------
+    dataset: FlickrDataset instance.
+    	Dataset to be splitted.
+        
+    train_size: float.
+    	Percentage of the data used to train the model.
+        
+    Returns:
+    train_dataset: FlickrDataset instance.
+    	Dataset containing the train samples.
+        
+    test_dataset: FlickrDataset instance.
+    	Dataset containing the test samples.
+    """
     # Finding idx of the data to train making sure no img is in train and test at the same time
     to_train = int(dataset.df.shape[0] * train_size)
 
@@ -82,13 +165,33 @@ def flickr_train_test_split(dataset, train_size):
 
     return train_dataset, test_dataset
 
+
 def make_dataset(config):
+    """
+    Loads the FlickrDataset previously processed.
+    
+    Parameters:
+    ------------
+    	config: dictionary
+        	Will have the data location from where the file will be loaded.
+    
+    Returns:
+    -----------
+    	dataset: FlickrDataset instance
+        	Loaded dataset.
+	"""
     dataset = joblib.load(config.DATA_LOCATION + "/processed_dataset.joblib")
     dataset.spacy_eng = spacy.load("en_core_web_sm")
     return dataset
 
 
 class ImgGroupingDataset:
+    """
+    Auxiliar class made to simplify the process of loading the processed data from the DataLoaders.
+    The data schema is: [[img1,[cap1, cap2, cap3, cap4, cap5]], [...], ...]]
+    
+    Helps avoiding redundance when storaging the images in the RAM.
+    """
     def __init__(self, data):
         self.data = data
 
@@ -96,12 +199,26 @@ class ImgGroupingDataset:
         return len(self.data)*5 # self.data has exactly num_imgs*captions_per_image = num_imgs*5
 
     def __getitem__(self, index): # Recives the index out of 40.000
-        # Schema: [[img1,[cap1, cap2, cap3, cap4, cap5]], [...], ...]]
         img = self.data[index//5][0]
         captions = self.data[index//5][1][index%5]
         return img, captions   # No preprocessing here
 
+    
 def preprocess_dataset(dataset):
+    """
+    Preprocesses the dataset before giving it to the data loader to avoid innecessary executions.
+    Saves the data in such a way that each image is only stored once.
+
+    Parameters:
+    ------------
+		dataset: FlickrDataset instance
+        	The dataset to be processed
+    
+    Returns:
+    ----------
+    	data_list: final processed data following the schema:  [[img1,[cap1, cap2, cap3, cap4, cap5]], [...], ...]]
+    """
+    
     data_list = []
     current_img_captions = []
     for idx, (img_name, caption) in dataset.df.reset_index(drop=True).iterrows():
@@ -123,8 +240,26 @@ def preprocess_dataset(dataset):
 
     return data_list
 
-def make_dataloaders(config, dataset, num_workers):
 
+def make_dataloaders(config, dataset, num_workers):
+	"""
+    Main function to get the data loaders from the dataset. Splits de dataset, preprocesses it and creates the data loaders.
+    
+    Parameters:
+    ------------
+    	config: dictionary.
+        	Contains the train_size split and the batch size information
+        dataset: FlickrDataset instance.
+        	Dataset from which the data loaders will be created.
+        num_workers: Number of workers to be used in the data loaders (recomended 1).
+        
+    Returns:
+    -----------
+    	train_loader: DataLoader instance.
+        	Contains the train data.
+        test_loader: DataLoader instance.
+        	Contains the test data.
+    """
     train_dataset, test_dataset = flickr_train_test_split(dataset, config.train_size)
 
     processed_train = ImgGroupingDataset(preprocess_dataset(train_dataset))
@@ -139,28 +274,69 @@ def make_dataloaders(config, dataset, num_workers):
 
 
 class Vocabulary:
+    """
+    Class used to tokenize the captions in both ways. Storages the vocabulary that will be used to tokenize the captions.
+    """
     def __init__(self, freq_threshold):
-        # setting the pre-reserved tokens int to string tokens
+        # int to string tokens
         self.itos = {0: "<PAD>", 1: "<SOS>", 2: "<EOS>", 3: "<UNK>"}
 
         # string to int tokens
-        # its reverse dict self.itos
         self.stoi = {v: k for k, v in self.itos.items()}
 
         self.freq_threshold = freq_threshold
         self.spacy_eng = spacy.load("en_core_web_sm")
+        
     def __len__(self):
         return len(self.itos)
 
     def get_caption(self, numerized_caption):
-        return [self.itos[x] for x in numerized_caption if x not in [0, 1]] # Not using SOS and PAD
-
+        """
+        Returns the captions from a tokenized list.
+        
+        Parameters:
+        ------------
+        	numerized_captions: list.
+            	Contains the tokenized captions.
+        
+        Returns:
+        ------------
+        	caption: list.
+            	contains the captions in str format.
+        """
+        caption = [self.itos[x] for x in numerized_caption if x not in [0, 1]] # Not using SOS and PAD
+        return caption
+    
     @staticmethod
     def tokenize(text, spacy_eng):
+        """
+        Returns the tokenized captions.
+        
+        Parameters:
+        ------------
+        	text: list.
+            	Contains the captions in str format.
+            spacy_eng: 
+            	Contains the tokenizer from spacy.
+        
+        Returns:
+        ------------
+        	tokenized_caption: list.
+            	contains the captions tokenized.
+        """
+        tokenized_caption =  [token.text.lower() for token in spacy_eng.tokenizer(text)]
+        return tokenized_caption
 
-        return [token.text.lower() for token in spacy_eng.tokenizer(text)]
-
+    
     def build_vocab(self, sentence_list):
+        """
+        Builds the vocabulary for the dataset based on the frequencies of the words and saves it into the object.
+        
+        Parameters:
+        ------------
+        	sentence_list: list of lists of str.
+            	Contains a list of the sentences. to be added to the vocab.
+        """
         frequencies = Counter()
         idx = 4
 
@@ -179,23 +355,22 @@ class Vocabulary:
                     self.itos[idx] = word
                     idx += 1
 
+                    
     def numericalize(self, text, spacy_eng):
         """ For each word in the text corresponding index token for that word form the vocab built as list """
         tokenized_text = self.tokenize(text, spacy_eng)
-
         return [self.stoi[token] if token in self.stoi else self.stoi["<UNK>"] for token in tokenized_text]
 
 
 class FlickrDataset(Dataset):
     """
-    FlickrDataset
+    Dataset class that storages the information needed to process the data.
     """
 
     def __init__(self, root_dir, captions_file, transform=None, freq_threshold=5):
         self.root_dir = root_dir
         self.df = pd.read_csv(captions_file)
         self.transform = transform
-
 
         # Get image and caption column from the dataframe
         self.imgs = self.df["image"]
@@ -278,6 +453,10 @@ def get_data_loader(dataset, dataset_aux, batch_size, shuffle=False, num_workers
 
 # helper function to save the model
 def save_model(model, config, model_path):
+    """
+    Saves the trained model into the path indicated.
+    """
+    
     model_state = {
         'embed_size': config.embed_size,
         'vocab_size': config.vocab_size,
@@ -290,9 +469,28 @@ def save_model(model, config, model_path):
     torch.save(model_state, model_path)
 
 
-# generate caption
 def get_caps_from(model, features_tensors, vocab, device='cuda'):
-    # generate the caption
+	"""
+    Generates the caption using the model and the encoded-decoded image.
+    
+    Parameters:
+    -----------
+    	model: EncoderDecoder instance.
+        	Model that will be used to predict the captions.
+            
+        feature_tensors: Tensor
+        	encoded-decoded image that will be fed to the model.
+         
+        vocab: Vocabulary instance.
+        	Will be used to generate the caption.
+            
+    Return:
+    ----------
+    	caps: list.
+        	Captions for the image.
+        alphas: list.
+        	Alphas of the attention given to each word from the caption.
+    """
     model.eval()
     with torch.no_grad():
         features = model.encoder(features_tensors.to(device))
@@ -302,7 +500,20 @@ def get_caps_from(model, features_tensors, vocab, device='cuda'):
 
 
 def generate_and_dump_dataset(root_dir, captions_file, transforms, data_location):
-    # initialize the dataset class
+    """
+    Creates the FlickrDataset and saves it into the indicated path.
+    
+    Parameters:
+    ------------
+    	root_dir: Str.
+        	Images directory.
+        captions_file: Str.
+        	Captions path.
+        transforms: List
+        	Transformations to be applied to the images.
+        data_location: Str.
+        	Path where the processed dataset will be dumped.
+    """
     dataset = FlickrDataset(
         root_dir=root_dir,
         captions_file=captions_file,
@@ -313,6 +524,12 @@ def generate_and_dump_dataset(root_dir, captions_file, transforms, data_location
 
 
 def test_model_performance(model, test_loader, device, vocab, epoch, config):
+    """
+    Tests the model with only the first image of the test DataLoader and saves the outputs such as the image, predicted caption,
+    real caption and the atention's alphas.
+    
+    Used for vizualization purposes.
+    """
     with torch.no_grad():
         dataiter = iter(deepcopy(test_loader))
         img, real_captions = next(dataiter)

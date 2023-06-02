@@ -9,25 +9,25 @@ class EncoderCNN(nn.Module):
     def __init__(self, encoder='ResNet50'):
         super(EncoderCNN, self).__init__()
 
+        # Chosing the encoder
         if encoder == 'ResNet50':
-            resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
+            my_encoder = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
         elif encoder == 'ResNet152':
-            resnet = models.resnet152(weights=models.ResNet152_Weights.DEFAULT)
+            my_encoder = models.resnet152(weights=models.ResNet152_Weights.DEFAULT)
         elif encoder == 'googleNet':
-            resnet = models.googlenet(pretrained=True)
+            my_encoder = models.googlenet(pretrained=True)
         elif encoder == 'VGG':
-            resnet = models.vgg19(weights=models.VGG19_Weights.DEFAULT)
-        else:
-            resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
+            my_encoder = models.vgg19(weights=models.VGG19_Weights.DEFAULT)
 
-        for param in resnet.parameters():
+        # We don't want to re-train the encoder. Using the pre-trained one.
+        for param in my_encoder.parameters():
             param.requires_grad_(False)
 
-        modules = list(resnet.children())[:-2]
-        self.resnet = nn.Sequential(*modules)
+        modules = list(my_encoder.children())[:-2]
+        self.my_encoder = nn.Sequential(*modules)
 
     def forward(self, images):
-        features = self.resnet(images)  # (batch_size,2048,7,7)
+        features = self.my_encoder(images)  # (batch_size,2048,7,7)
         features = features.permute(0, 2, 3, 1)  # (batch_size,7,7,2048)
         features = features.view(features.size(0), -1, features.size(-1))  # (batch_size,49,2048)
         return features
@@ -184,7 +184,18 @@ class EncoderDecoder(nn.Module):
 
 
 def make_model(config, device='cuda'):
-    # make the model
+    """
+    Generates the model. If another model wants to be used, add it here with the propper conditionals.
+    
+    Parameters:
+    ------------
+    config: Dictionary.
+    	Must have the parameters explained in the "model_pipeline" function.
+        
+    Returns:
+    -----------
+    model: Generated model.
+    """
     model = EncoderDecoder(config.embed_size, config.vocab_size, config.attention_dim, config.encoder_dim,
                            config.decoder_dim, device=device, encoder=config.encoder).to(device)
 
@@ -192,7 +203,20 @@ def make_model(config, device='cuda'):
 
 
 def load_ED_model(model_path):
-    # Call: model = load_ED_model('attention_model_state.pth')
+    """
+    Loads a saved model given the model_path. 
+    
+    Call example: model = load_ED_model('attention_model_state.pth')
+    
+    Parameters:
+    ------------
+    model_path: str.
+    	Path of the saved model.
+        
+    Returns:
+    -----------
+    model: Loaded model
+    """
     checkpoint = torch.load(model_path)
 
     model = EncoderDecoder(
