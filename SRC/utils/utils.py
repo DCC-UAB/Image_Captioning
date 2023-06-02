@@ -146,22 +146,18 @@ def flickr_train_test_split(dataset, train_size):
 
     # Splitting dataset
     dataset.df = dataset.df.sort_values(by='image').reset_index(drop=True) # Grouping each img in 5 rows
-    train_X = dataset.df.iloc[:to_train]
-    test_X = dataset.df.iloc[to_train:]
+    train_X, test_X = dataset.df.iloc[:to_train], dataset.df.iloc[to_train:]
 
     # Creating the datasets
-    train_dataset = deepcopy(dataset)
-    test_dataset = deepcopy(dataset)
-
+    train_dataset, test_dataset = deepcopy(dataset), deepcopy(dataset)
+    
     train_dataset.df = train_X
     train_dataset.df.reset_index(drop=True, inplace=True)
-    train_dataset.imgs = train_X['image']
-    train_dataset.captions = train_X['caption']
+    train_dataset.imgs, train_dataset.captions = train_X['image'], train_X['caption']
 
     test_dataset.df = test_X
     test_dataset.df.reset_index(drop=True, inplace=True)
-    test_dataset.imgs = test_X['image']
-    test_dataset.captions = test_X['caption']
+    test_dataset.imgs, test_dataset.captions = test_X['image'], test_X['caption']
 
     return train_dataset, test_dataset
 
@@ -543,5 +539,3 @@ def test_model_performance(model, test_loader, device, vocab, epoch, config):
         joblib.dump(caption, config.DATA_LOCATION+'/logs'+'/caption_epoch_' + str(epoch) + '.joblib')
         joblib.dump(caps, config.DATA_LOCATION + '/logs' + '/caps_epoch_' + str(epoch) + '.joblib')
         joblib.dump(alphas, config.DATA_LOCATION+ '/logs' + '/aphas_epoch_' + str(epoch) + '.joblib')
-
-

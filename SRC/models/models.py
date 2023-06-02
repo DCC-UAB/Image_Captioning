@@ -201,8 +201,7 @@ def make_model(config, device='cuda'):
 
     return model
 
-
-def load_ED_model(model_path):
+def load_ED_model(model_path, device, encoder='ResNet50'):
     """
     Loads a saved model given the model_path. 
     
@@ -217,14 +216,15 @@ def load_ED_model(model_path):
     -----------
     model: Loaded model
     """
-    checkpoint = torch.load(model_path)
+    checkpoint = torch.load(model_path, map_location=torch.device(device))
 
     model = EncoderDecoder(
         embed_size=checkpoint['embed_size'],
         vocab_size=checkpoint['vocab_size'],
         attention_dim=checkpoint['attention_dim'],
         encoder_dim=checkpoint['encoder_dim'],
-        decoder_dim=checkpoint['decoder_dim']
+        decoder_dim=checkpoint['decoder_dim'],
+        encoder=encoder
     )
     model.load_state_dict(checkpoint['state_dict'])
 
