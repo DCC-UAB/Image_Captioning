@@ -28,7 +28,7 @@ class EncoderCNN(nn.Module):
             param.requires_grad_(False)
 
         modules = list(my_encoder.children())[:-2]
-        self.my_encoder = nn.Sequential(*modules)
+        self.resnet = nn.Sequential(*modules)
 
     def forward(self, images):
         features = self.my_encoder(images)  # (batch_size,2048,7,7)

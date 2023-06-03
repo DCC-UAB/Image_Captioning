@@ -181,6 +181,25 @@ def make_dataset(config):
     return dataset
 
 
+def make_dataset_notebook(config):
+    """
+    Loads the FlickrDataset previously processed. Adapted for use in notebooks.
+
+    Parameters:
+    ------------
+        config: dictionary
+            Will have the data location from where the file will be loaded.
+
+    Returns:
+    -----------
+        dataset: FlickrDataset instance
+            Loaded dataset.
+    """
+    dataset = joblib.load(config['DATA_LOCATION'] + "/processed_dataset.joblib")
+    dataset.spacy_eng = spacy.load("en_core_web_sm")
+    return dataset
+
+
 class ImgGroupingDataset:
     """
     Auxiliar class made to simplify the process of loading the processed data from the DataLoaders.
@@ -265,6 +284,34 @@ def make_dataloaders(config, dataset, num_workers):
                                    num_workers=num_workers, shuffle=True)
     test_loader = get_data_loader(processed_test, dataset, batch_size = 5,
                                   num_workers=num_workers, shuffle=False)
+
+    return train_loader, test_loader
+
+
+def make_dataloaders_notebook(config, dataset, num_workers):
+    """
+    Main function to get the data loaders from the dataset. Splits de dataset and creates the data loaders.
+    Adapted for use in notebook.
+
+    Parameters:
+    ------------
+        config: dictionary.
+            Contains the train_size split and the batch size information
+        dataset: FlickrDataset instance.
+            Dataset from which the data loaders will be created.
+        num_workers: Number of workers to be used in the data loaders (recomended 1).
+
+    Returns:
+    -----------
+        train_loader: DataLoader instance.
+            Contains the train data.
+        test_loader: DataLoader instance.
+            Contains the test data.
+    """
+    train_dataset, test_dataset = flickr_train_test_split(dataset, config['train_size'])
+
+    train_loader = get_data_loader(train_dataset, dataset, batch_size=config['batch_size'], num_workers=num_workers)
+    test_loader = get_data_loader(test_dataset, dataset, batch_size=5, num_workers=num_workers)
 
     return train_loader, test_loader
 

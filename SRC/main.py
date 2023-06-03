@@ -62,10 +62,10 @@ def model_pipeline(cfg: dict):
         momentum: Momentum used for the optimizer if required.
         device: Device used. 'CPU' or 'cuda:0'.
         encoder: Pre-trained net used for encoding the data. 'ResNet50', 'ResNet152', 'googleNet', 'VGG'.
-        transforms: Transforms applied to the images.
+        transforms: Transforms applied to the images. 'transforms_2' is a bit faster.
         embed_size: Embedding size. Recomended: 300
         attention_dim: Dimension for the attention. Recomended: 256.
-        encoder_dim: Dimension for the encoder. Depends of the encoder chosen. Recomended: 2048 (ResNet). 512 (VGG). 1024 (GoogleNet)
+        encoder_dim: Dimension for the encoder. Depends on the encoder chosen. Recomended: 2048 (ResNet). 512 (VGG). 1024 (GoogleNet)
         decoder_dim: Dimension for the decoder. Recomended: 512.
         
     Returns
@@ -169,7 +169,7 @@ if __name__ == "__main__":
         # Model data
         optimizer='Adam',
         criterion='CrossEntropy',
-        learning_rate=0.0003,
+        learning_rate=3e-4,
         device=device,
         encoder='ResNet152',
         transforms=transforms_2,
