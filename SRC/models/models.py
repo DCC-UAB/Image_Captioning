@@ -31,7 +31,7 @@ class EncoderCNN(nn.Module):
         self.resnet = nn.Sequential(*modules)
 
     def forward(self, images):
-        features = self.my_encoder(images)  # (batch_size,2048,7,7)
+        features = self.resnet(images)  # (batch_size,2048,7,7)
         features = features.permute(0, 2, 3, 1)  # (batch_size,7,7,2048)
         features = features.view(features.size(0), -1, features.size(-1))  # (batch_size,49,2048)
         return features
