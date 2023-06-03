@@ -7,8 +7,12 @@ import torch.nn.functional as F
 # Image Encoder
 class EncoderCNN(nn.Module):
     """
-    Encodes the image using the pre-trained CNN sended as argument.
-    Possible encoders: ResNet50, ResNet152, googleNet, VGG
+    Encodes the image using the pre-trained CNN sent as argument.
+    Possible encoders: ResNet50, ResNet152, googleNet, VGG.
+
+    It extracts the relevant features from the image as a Tensor,
+    and then reshapes it, so it matches the format of the following
+    phases of the model.
     """
     def __init__(self, encoder='ResNet50'):
         super(EncoderCNN, self).__init__()
@@ -37,10 +41,11 @@ class EncoderCNN(nn.Module):
         return features
 
 
-# Bahdanau Attention
 class Attention(nn.Module):
     """
-    Performs attention algorithm to decide which words to use in the captions.
+    Attention mechanism based on the Bahdanau attention (also known as additive
+    attention). Used to weigh the relevance of input features when generating
+    the next word of the caption.
     """
     
     def __init__(self, encoder_dim, decoder_dim, attention_dim):
@@ -73,7 +78,11 @@ class Attention(nn.Module):
 # Attention Decoder
 class DecoderRNN(nn.Module):
     """
-    Decoder using LSTM to create the captions in combination with the attention.
+    Performs the embedding of the words of the caption as they are generated.
+    To generate the words it uses an LSTM (RNN) combined with an attention mechanism.
+    The words are generated in a for loop, where the features of the image coming from
+    the Encoder are combined with the attention scores to produce a context vector, which
+    is then used to determine what information is relevant to produce the next word.
     """
     def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, drop_prob=0.3, device='cuda'):
         super().__init__()
@@ -175,7 +184,9 @@ class DecoderRNN(nn.Module):
 # Full model
 class EncoderDecoder(nn.Module):
     """
-    Wrapper that contains the full model encoder-decoder to predict captions from a given image.
+    Wrapper that contains the full model encoder-decoder to predict captions
+    from a given image. The images are sent to the encoder, which returns the features,
+    then the features are sent to the decoder, which returns the captions.
     """
     def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, drop_prob=0.3, device='cuda', encoder='ResNet50'):
         super().__init__()
