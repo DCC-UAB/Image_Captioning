@@ -134,7 +134,10 @@ Happy testing!
 From the original notebook much has changed, a summary:
   - Clean code organization: changed from a notebook format to a whole project with its organized auxiliar files.
   - Faster preprocessing and training: optimized both preprocessing and training for shorter execution times and improved memory allocation.
+  - Train test split: implemented a train test split without bias.
   - Added customization: implemented multiple options for some parts of the model, to improve its performance.
+  - Training metrics: metrics exported in local files for additional analysis.
+  - Test metrics: used the BLEU metric in test.py.
   - Documentation: documented every function for a better understanding.
   - EDA and Visualization: created notebooks for a better insight of the dataset and the model.
 
