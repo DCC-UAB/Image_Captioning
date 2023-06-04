@@ -2,6 +2,7 @@ import wandb
 import torch
 from utils.utils import *
 from nltk.translate.bleu_score import sentence_bleu
+import numpy as np
 
 
 def test(model, test_loader, criterion, vocab, config, device="cuda", verbatim=True):

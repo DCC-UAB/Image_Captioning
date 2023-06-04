@@ -30,7 +30,7 @@ def get_criterion(name, ignoring_index):
     if name == 'CrossEntropy':
         return nn.CrossEntropyLoss(ignore_index=ignoring_index)
     elif name == 'MSE':
-        return torch.nn.MSELoss(ignore_index=ignoring_index)
+        return torch.nn.MSELoss()
     else:
         print("WRONG CRITERION")
         return nn.CrossEntropyLoss(ignore_index=ignoring_index)
@@ -51,14 +51,14 @@ def get_optimizer(name, params, lr, momentum=None):
     Optimizer.
     """
     if name == 'Adam':
-        return torch.optim.Adam(params=params, lr = lr)
+        return torch.optim.Adam(params=params, lr=lr)
     elif name == 'Adagrad':
-        return torch.optim.Adagrad(params=params, lr = lr)
+        return torch.optim.Adagrad(params=params, lr=lr)
     elif name == 'SGD':
-        return torch.optim.SGD(params=params, lr = lr, momentum = momentum)
+        return torch.optim.SGD(params=params, lr=lr, momentum=momentum)
     else:
         print("WRONG Optimizer")
-        return torch.optim.Adam(params=params, lr = lr)
+        return torch.optim.Adam(params=params, lr=lr)
 
     
 def export_data(train_loss_arr_epoch, test_loss_arr_epoch, acc_arr_epoch, train_execution_times, test_execution_times,
@@ -316,6 +316,36 @@ def make_dataloaders_notebook(config, dataset, num_workers):
     return train_loader, test_loader
 
 
+def get_data_loader(dataset, dataset_aux, batch_size, shuffle=False, num_workers=1):
+    """
+    Returns torch dataloader for the flicker8k dataset
+
+    Parameters
+    -----------
+    dataset: FlickrDataset or List of lists
+        custom torchdataset named FlickrDataset
+    batch_size: int
+        number of data to load in a particular batch
+    shuffle: boolean,optional;
+        should shuffle the dataset (default is False)
+    num_workers: int,optional
+        numbers of workers to run (default is 1)
+    """
+
+    pad_idx = dataset_aux.vocab.stoi["<PAD>"]
+    collate_fn = CapsCollate(pad_idx=pad_idx, batch_first=True)
+
+    data_loader = DataLoader(
+        dataset=dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        num_workers=num_workers,
+        collate_fn=collate_fn
+    )
+
+    return data_loader
+
+
 class Vocabulary:
     """
     Class used to tokenize the captions in both ways. Storages the vocabulary that will be used to tokenize the captions.
@@ -464,34 +494,6 @@ class CapsCollate:
         return imgs, targets
 
 
-def get_data_loader(dataset, dataset_aux, batch_size, shuffle=False, num_workers=1):
-    """
-    Returns torch dataloader for the flicker8k dataset
-    
-    Parameters
-    -----------
-    dataset: FlickrDataset or List of lists
-        custom torchdataset named FlickrDataset 
-    batch_size: int
-        number of data to load in a particular batch
-    shuffle: boolean,optional;
-        should shuffle the dataset (default is False)
-    num_workers: int,optional
-        numbers of workers to run (default is 1)  
-    """
-
-    pad_idx = dataset_aux.vocab.stoi["<PAD>"]
-    collate_fn = CapsCollate(pad_idx=pad_idx, batch_first=True)
-
-    data_loader = DataLoader(
-        dataset=dataset,
-        batch_size=batch_size,
-        shuffle=shuffle,
-        num_workers=num_workers,
-        collate_fn=collate_fn
-    )
-
-    return data_loader
 
 
 # helper function to save the model

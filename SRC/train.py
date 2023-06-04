@@ -58,7 +58,7 @@ def train(model, data_loader, criterion, optimizer, config, epoch=-1, verbatim =
         # Report metrics every 25th batch
         if ((idx + 1) % 25) == 0 and verbatim:
             example_ct += len(image)
-            train_log(loss, example_ct, epoch)
+            train_log(loss, example_ct, epoch, config.batch_size)
 
     return loss_arr_batch, time.time()-t0
 
@@ -88,9 +88,9 @@ def train_batch(image, captions, model, vocab_size, optimizer, criterion, device
     return loss
 
 
-def train_log(loss, example_ct, epoch):
+def train_log(loss, example_ct, epoch, batch_size):
     """
     Logs on wandb and console.
     """
     wandb.log({"epoch": epoch, "loss": loss}, step=example_ct)
-    print(f"Loss after {str(example_ct).zfill(5)} examples: {loss:.3f}")
+    print(f"Loss after {str(example_ct*batch_size).zfill(5)} examples: {loss:.3f}")
